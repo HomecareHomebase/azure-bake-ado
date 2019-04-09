@@ -1,0 +1,46 @@
+{
+  "manifestVersion": 1,
+  "id": "azure-bake",
+  "name": "Azure Bake Tools",
+  "version": "0.5.0",
+  "publisher": "HomecareHomebase",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "",
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "files": [
+    {
+      "path": "tasks/mix"
+    },
+    {
+      "path": "tasks/serve"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "azure-bake-mix",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "mix"
+      }
+    },
+    {
+      "id": "azure-bake-serve",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "serve"
+      }
+    }
+  ]
+}
