@@ -1,0 +1,16 @@
+trigger:
+  branches:
+    include:
+    - master
+    - release/v*
+    - refs/tags/v*
+pr:
+  branches:
+    include:
+    - master
+    - release/v*
+pool:
+  vmImage: 'vs2017-win2016'
+steps:
+- powershell: 'Get-ChildItem env:'
+  displayName: 'Print Environment Variables'
