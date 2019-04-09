@@ -1,3 +1,6 @@
+variables:
+- group: GitHub Token
+- group: VS Marketplace Token
 trigger:
   branches:
     include:
@@ -12,5 +15,14 @@ pr:
 pool:
   vmImage: 'vs2017-win2016'
 steps:
-- powershell: 'Get-ChildItem env:'
-  displayName: 'Print Environment Variables'
+- powershell: 'Get-ChildItem Env:'
+  displayName: 'Get-ChildItem Env:'
+- task: PowerShell@2
+  displayName: 'Cake Build'
+  inputs:
+    targetType: filePath
+    filePath: ./build.ps1
+    arguments: '-Target $(Target) -Configuration $(Configuration) -Verbosity $(Verbosity)'
+  env:
+    GITHUB_TOKEN: $(GitHubToken)
+    VS_MARKETPLACE_TOKEN: $(VsMarketplaceToken)
