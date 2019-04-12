@@ -5,6 +5,7 @@
 #addin nuget:?package=MagicChunks&version=2.0.0.119
 #addin nuget:?package=Cake.Tfx&version=0.8.0
 #addin nuget:?package=Cake.Npm&version=0.16.0
+#addin nuget:?package=Cake.Incubator&version=4.0.2
 
 //////////////////////////////////////////////////////////////////////
 // TOOLS
@@ -53,6 +54,8 @@ Setup(context =>
         parameters.Target,
         parameters.Version.CakeVersion,
         parameters.IsTagged);
+
+    Information("Parameters: {0}", parameters.Dump());
 });
 
 //////////////////////////////////////////////////////////////////////

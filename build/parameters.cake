@@ -24,7 +24,7 @@ public class BuildParameters
         get
         {
             return !IsLocalBuild && !IsPullRequest && IsMasterRepo
-                && IsMasterBranch && IsTagged;
+                && IsTagged;
         }
     }
 
