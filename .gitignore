@@ -6,3 +6,5 @@ tools/**
 !tools/packages.config
 artifacts/
 **/dist/**
+**/.nyc_output/**
+**/coverage/**

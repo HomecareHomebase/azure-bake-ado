@@ -7,10 +7,15 @@
     "typescript": "^3.4.3"
   },
   "scripts": {
-    "clean:build:test": "lerna clean --yes && lerna bootstrap --hoist && lerna run compile && lerna run test",
-    "clean:build": "lerna clean --yes && lerna bootstrap --hoist && lerna run compile",
-    "load:build": "lerna bootstrap --hoist && lerna run compile",
-    "build": "lerna bootstrap --hoist && lerna run compile",
-    "publish": "npm run clean:build && lerna publish --conventional-commits --yes"
+    "clean": "lerna clean --yes",
+    "bootstrap": "lerna bootstrap --hoist",
+    "compile": "lerna run compile",
+    "test": "lerna run test",
+    "clean:build:test:publish": "npm run clean:build:test && lerna publish --conventional-commits --yes",
+    "clean:build:publish": "npm run clean:build && lerna publish --conventional-commits --yes",
+    "clean:build:test": "npm run clean && npm run bootstrap && npm run compile && npm run test",
+    "clean:build": "npm run clean && npm run bootstrap && npm run compile",
+    "load:build": "npm run bootstrap && npm run compile"
+    
   }
 }
