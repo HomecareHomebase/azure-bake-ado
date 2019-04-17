@@ -1,0 +1,10 @@
+0 silly argv { _: [ 'clean' ],
+0 silly argv   yes: true,
+0 silly argv   y: true,
+0 silly argv   lernaVersion: '3.13.3',
+0 silly argv   '$0': 'node_modules\\lerna\\cli.js' }
+1 notice cli v3.13.3
+2 verbose rootPath C:\Users\csperbeck\source\repos\azure-bake-ado
+3 error JSONError: Unexpected token } in JSON at position 384 while parsing near '...r src/tests.ts",  },  "author": "Tan...' in tasks\mix\package.json
+3 error     at module.exports (C:\Users\csperbeck\source\repos\azure-bake-ado\node_modules\parse-json\index.js:26:19)
+3 error     at parse (C:\Users\csperbeck\source\repos\azure-bake-ado\node_modules\load-json-file\index.js:8:29)

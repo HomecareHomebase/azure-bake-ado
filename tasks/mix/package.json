@@ -10,7 +10,7 @@
   "scripts": {
     "compile": "tsc -p .",
     "watch": "tsc -w -p .",
-    "test": "mocha -r ts-node/register src/tests.ts",
+    "test": "mocha -r ts-node/register src/tests.ts"
   },
   "author": "Tanner Watson",
   "license": "ISC",
@@ -27,6 +27,6 @@
   },
   "dependencies": {
     "azure-pipelines-task-lib": "^2.8.0",
-    "docker-common": "file:../../imports/docker-common-1.0.0.tgz"
+    "docker-common": "file:imports/docker-common-1.0.0.tgz"
   }
 }
