@@ -1,15 +1,15 @@
 {
-    "name": "root",
-    "private": true,
-    "devDependencies": {
-      "@types/node": "^11.13.1",
-      "lerna": "^3.13.0",
-      "typescript": "^3.4.3"
-    },
-    "scripts": {
-      "clean:build": "lerna clean --yes && lerna bootstrap --hoist && lerna run compile",
-      "load:build": "lerna bootstrap --hoist && lerna run compile",
-      "build": "lerna bootstrap --hoist && lerna run compile",
-      "publish": "npm run clean:build && lerna publish --conventional-commits --yes"
-    }
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^11.13.1",
+    "lerna": "^3.13.0",
+    "typescript": "^3.4.3"
+  },
+  "scripts": {
+    "clean:build": "lerna clean --yes && lerna bootstrap --hoist && lerna run compile",
+    "load:build": "lerna bootstrap --hoist && lerna run compile",
+    "build": "lerna bootstrap --hoist && lerna run compile",
+    "publish": "npm run clean:build && lerna publish --conventional-commits --yes"
   }
+}
