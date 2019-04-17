@@ -12,7 +12,7 @@
     "watch": "tsc -w -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Tanner Watson",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^11.13.1",
