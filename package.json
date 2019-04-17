@@ -7,6 +7,7 @@
     "typescript": "^3.4.3"
   },
   "scripts": {
+    "clean:build:test": "lerna clean --yes && lerna bootstrap --hoist && lerna run compile && lerna run test",
     "clean:build": "lerna clean --yes && lerna bootstrap --hoist && lerna run compile",
     "load:build": "lerna bootstrap --hoist && lerna run compile",
     "build": "lerna bootstrap --hoist && lerna run compile",
