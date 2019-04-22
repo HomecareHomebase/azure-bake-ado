@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "azure-bake",
   "name": "Azure Bake Tools",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "publisher": "HomecareHomebase",
   "targets": [
     {
@@ -15,10 +15,12 @@
   ],
   "files": [
     {
-      "path": "tasks/mix"
+      "path": "mix",
+      "addressable": true
     },
     {
-      "path": "tasks/serve"
+      "path": "serve",
+      "addressable": true
     }
   ],
   "contributions": [
