@@ -2,14 +2,14 @@
   "manifestVersion": 1,
   "id": "azure-bake",
   "name": "Azure Bake Tools",
-  "version": "0.1.5",
+  "version": "0.1.12",
   "publisher": "HomecareHomebase",
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "description": "",
+  "description": "Extension for the usage of the Azure Bake IaC Tool",
   "categories": [
     "Azure Pipelines"
   ],
