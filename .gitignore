@@ -5,3 +5,4 @@ tasks/**/*.js
 tools/**
 !tools/packages.config
 artifacts/
+node_modules/

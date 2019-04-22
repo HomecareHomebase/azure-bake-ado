@@ -1,12 +1,13 @@
 {
-  "name": "serve",
-  "version": "0.1.2",
-  "description": "",
+  "name": "Azure-Bake-Serve",
+  "version": "0.1.5",
+  "description": "A plugin to use the Bake IaC deployment system for Azure",
+  "repository": "https://github.com/HomecareHomebase/azure-bake-ado",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "HomecareHomebase",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^11.13.2",
