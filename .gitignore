@@ -1,8 +1,9 @@
 node_modules/
 *.vsix
-tasks/**/*.js
-
+**/*.js
+**/*.js.map
+node_modules
 tools/**
 !tools/packages.config
 artifacts/
-node_modules/
+
