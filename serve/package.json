@@ -10,7 +10,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean:build": "Remove-Item ./dist -recurse -force; Remove-Item ./node_modules -recurse -force; npm install; tsc -p ."
+    "clean": "cmd /c powershell.exe -Command { Remove-Item ./dist -recurse -force; Remove-Item ./node_modules -recurse -force } && npm install",
+    "compile": "tsc -p .",
+    "clean:build": "npm run clean && npm run compile"
   },
   "author": "HomecareHomebase",
   "license": "ISC",

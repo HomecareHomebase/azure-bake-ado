@@ -1,0 +1,18 @@
+{
+    "name": "root",
+    "version": "0.0.0",
+    "description": "A plugin to use the Bake IaC deployment system for Azure",
+    "repository": "https://github.com/HomecareHomebase/azure-bake-ado",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "clean:build": "cd ./serve && npm run clean:build && cd ../mix && npm run clean:build"
+    },
+    "author": "HomecareHomebase",
+    "license": "ISC",
+    "devDependencies": {
+        "tfx-cli": "0.*",
+        "typscript": "*.*.*",
+        "@types/node": "^11.13.1",
+        "@types/q": "^1.5.2"
+    }
+}
