@@ -9,7 +9,7 @@
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch": 12
+        "Patch":  19
     },
     "instanceNameFormat": "Azure Bake Serve",
     "showEnvironmentVariables": true,
@@ -77,7 +77,7 @@
     ],
     "execution": {
         "Node": {
-            "target": "dist/index.js"
+            "target": "index.js"
         }
     }
 }

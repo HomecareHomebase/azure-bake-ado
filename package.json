@@ -5,7 +5,8 @@
     "repository": "https://github.com/HomecareHomebase/azure-bake-ado",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "clean:build": "cd ./serve && npm run clean:build && cd ../mix && npm run clean:build"
+        "clean:build": "cd ./serve && npm run clean:build && cd ../mix && npm run clean:build",
+        "package": "npx tfx extension create --rev-version --manifest-globs vss-extension.json"
     },
     "author": "HomecareHomebase",
     "license": "ISC",

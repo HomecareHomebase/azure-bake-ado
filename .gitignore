@@ -1,9 +1,7 @@
 node_modules/
 *.vsix
-**/*.js
-**/*.js.map
-node_modules
+*.js
+*.js.map
 tools/**
 !tools/packages.config
 artifacts/
-dist/

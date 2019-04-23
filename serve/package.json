@@ -1,17 +1,17 @@
 {
   "name": "Azure-Bake-Serve",
-  "version": "0.1.12",
+  "version": "0.1.17",
   "description": "A plugin to use the Bake IaC deployment system for Azure",
   "repository": "https://github.com/HomecareHomebase/azure-bake-ado",
-  "main": "dist/index.js",
-  "typings": "src/index.ts",
+  "main": "index.js",
+  "typings": "index.ts",
   "directories": {
-    "lib": "dist"
+    "lib": "."
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "cmd /c powershell.exe -Command { Remove-Item ./dist -recurse -force; Remove-Item ./node_modules -recurse -force } && npm install",
-    "compile": "tsc -p .",
+    "compile": "tsc",
     "clean:build": "npm run clean && npm run compile"
   },
   "author": "HomecareHomebase",
