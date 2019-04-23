@@ -4,6 +4,9 @@
   "name": "Azure Bake Tools",
   "version": "0.1.21",
   "publisher": "HomecareHomebase",
+  "icons": {
+    "default": "tools-icon.png"
+  },
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
@@ -19,7 +22,7 @@
     },
     {
       "path": "tasks/serve"
-    }    
+    }      
   ],
   "contributions": [
     {

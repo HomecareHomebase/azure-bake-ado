@@ -1,7 +1,10 @@
-node_modules/
 *.vsix
 *.js
 *.js.map
 tools/**
 !tools/packages.config
 artifacts/
+coverage/
+.nyc_output/
+dist/
+node_modules/
