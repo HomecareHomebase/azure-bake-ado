@@ -1,6 +1,6 @@
-import clitask from "./index"
-import * from "mocha"
-import * from "chai"
+import { clitask } from "./index"
+import mocha = require("mocha");
+import chai = require('chai');
 
 describe('clitask', function() {
     it('runMain', function() {

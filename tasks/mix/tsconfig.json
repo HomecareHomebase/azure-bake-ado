@@ -5,6 +5,7 @@
       "sourceRoot": "./"
   },
   "files": [
-      "index.ts"
+      "index.ts",
+      "tests.ts"
   ]
 }
