@@ -15,10 +15,10 @@
   ],
   "files": [
     {
-      "path": "mix"
+      "path": "tasks/mix"
     },
     {
-      "path": "serve"
+      "path": "tasks/serve"
     }    
   ],
   "contributions": [
@@ -29,7 +29,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "mix"
+        "name": "tasks/mix"
       }
     },
     {
@@ -39,7 +39,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "serve"
+        "name": "tasks/serve"
       }
     }
   ]

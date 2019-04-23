@@ -4,16 +4,33 @@
     "description": "A plugin to use the Bake IaC deployment system for Azure",
     "repository": "https://github.com/HomecareHomebase/azure-bake-ado",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "clean:build": "cd ./serve && npm run clean:build && cd ../mix && npm run clean:build",
-        "package": "npx tfx extension create --root . --output-path dist --rev-version --manifest-globs vss-extension.json"
+        "initdev": "npm run initdev:npm",
+        "initdev:npm": "npm run initdev:npm:base & npm run initdev:npm:tasks",
+        "initdev:npm:base": "npm install --no-progress --no-update-notifier",
+        "initdev:npm:tasks": "npx glob-exec --parallel --foreach \"tasks/**/tsconfig.json\" -- \"cd {{file.dir}} && npm install --no-update-notifier --no-progress\"",
+        "compile:tasks": "npx glob-exec \"tasks/**/tsconfig.json\" -- \"tsc -b {{files.join(' ')}}\"",
+        "postcompile:tasks": "npm run lint:tasks",
+        "lint:tasks": "npx glob-exec --parallel --foreach \"tasks/**/tsconfig.json\" -- \"tslint -p {{file}} -c tslint.json\"",
+        "package:tasks": "npx tfx extension create --root . --output-path dist --manifest-globs vss-extension.json",
+        "test:tasks": "npx glob-exec --parallel --foreach \"tasks/**/tests.ts\" -- \"nyc --reporter=html --reporter=text mocha -r ts-node/register {{file}}\"",
+        "test": "npm run test:tasks",
+        "build": "npm run build:tasks",
+        "clean:build": "npm run clean && npm run initdev && npm run build",
+        "clean:build:test": "npm run clean && npm run initdev && npm run build && npm run test",
+        "build:tasks": "npm run compile:tasks",
+        "clean": "git clean -fdX",
+        "package": "npm run package:tasks",
+        "publish": "npx tfx extension publish --manifest-globs vss-extension.json --share-with ${ORG_SHARE} --token ${VSMARKETPLACETOKEN} --rev-version",
+        "full": "npm run build:clean:test && npm run package"
     },
     "author": "HomecareHomebase",
     "license": "ISC",
     "dependencies": {
         "tfx-cli": "^0.7.3",
         "typescript": "^3.4.4",
-        "glob-exec": "^0.1.1"
+        "glob-exec": "^0.1.1",
+        "tslint": "^5.13.1",
+        "typestrict": "^1.0.2"
     },
     "devDependencies": {
         "@types/node": "^11.13.1",
