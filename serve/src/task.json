@@ -8,8 +8,8 @@
     "author": "HomecareHomebase",
     "version": {
         "Major": 0,
-        "Minor": 5,
-        "Patch": 0
+        "Minor": 1,
+        "Patch": 12
     },
     "instanceNameFormat": "Azure Bake Serve",
     "showEnvironmentVariables": true,
@@ -77,7 +77,7 @@
     ],
     "execution": {
         "Node": {
-            "target": "index.js"
+            "target": "dist/index.js"
         }
     }
 }

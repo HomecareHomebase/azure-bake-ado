@@ -1,11 +1,16 @@
 {
   "name": "Azure-Bake-Mix",
-  "version": "0.1.5",
+  "version": "0.1.12",
   "description": "A plugin to use the Bake IaC deployment system for Azure",
   "repository": "https://github.com/HomecareHomebase/azure-bake-ado",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "typings": "src/index.ts",
+  "directories": {
+    "lib": "dist"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean:build": "Remove-Item ./dist -recurse -force; Remove-Item ./node_modules -recurse -force; npm install; tsc -p ."
   },
   "author": "HomecareHomebase",
   "license": "ISC",

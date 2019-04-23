@@ -9,7 +9,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { IExecOptions } from 'azure-pipelines-task-lib/toolrunner';
 
-tl.setResourcePath(path.join(__dirname, 'task.json'));
+tl.setResourcePath(path.join(__dirname, '../src/task.json'));
 
 export class clitask {
 
