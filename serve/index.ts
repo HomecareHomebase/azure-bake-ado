@@ -1,4 +1,4 @@
-import tl = require('azure-pipelines-task-lib/task');
+import * as tl from "azure-pipelines-task-lib/task";
 import * as path from 'path'
 import * as fs from 'fs'
 import {Buffer} from 'buffer'

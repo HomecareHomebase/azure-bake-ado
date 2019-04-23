@@ -6,13 +6,14 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "clean:build": "cd ./serve && npm run clean:build && cd ../mix && npm run clean:build",
-        "package": "npx tfx extension create --rev-version --manifest-globs vss-extension.json"
+        "package": "npx tfx extension create --root . --output-path dist --rev-version --manifest-globs vss-extension.json"
     },
     "author": "HomecareHomebase",
     "license": "ISC",
     "dependencies": {
         "tfx-cli": "^0.7.3",
-        "typescript": "^3.4.4"
+        "typescript": "^3.4.4",
+        "glob-exec": "^0.1.1"
     },
     "devDependencies": {
         "@types/node": "^11.13.1",
