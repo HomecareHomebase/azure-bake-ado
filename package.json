@@ -9,9 +9,11 @@
     },
     "author": "HomecareHomebase",
     "license": "ISC",
+    "dependencies": {
+        "tfx-cli": "^0.7.3",
+        "typescript": "^3.4.4"
+    },
     "devDependencies": {
-        "tfx-cli": "0.*",
-        "typscript": "*.*.*",
         "@types/node": "^11.13.1",
         "@types/q": "^1.5.2"
     }
