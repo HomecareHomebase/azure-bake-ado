@@ -1,0 +1,18 @@
+{
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ],
+    "reporter": [
+      "html",
+      "text",
+      "text-summary",
+      "lcov"
+    ],
+    "all": true  
+  }
+}
