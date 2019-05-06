@@ -5,10 +5,10 @@
       "sourceRoot": "./"
   },
   "files": [
-      "index.ts",
-      "tests.ts"
+      "index.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tests.ts"
   ]
 }

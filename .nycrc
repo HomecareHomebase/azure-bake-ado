@@ -1,18 +1,30 @@
 {
-  "nyc": {
-    "extension": [
-      ".ts",
-      ".tsx"
+    "all": true,
+    "check-coverage": true,
+    "cache": true,
+    "recursive": true,
+    "include": [
+            "tasks/**/*.ts"
+    ],
+    "include": [
+        "tasks/**/*.ts"
     ],
     "exclude": [
-      "**/*.d.ts"
+            "coverage/",
+            "node_modules/"
     ],
+    "extensions": [
+        ".ts",
+        ".tsx"
+    ],
+    "report-dir": "./coverage",
     "reporter": [
-      "html",
-      "text",
-      "text-summary",
-      "lcov"
+        "clover",
+        "lcov",
+        "cobertura",
+        "html",
+        "text",
+        "text-summary"
     ],
-    "all": true  
-  }
+    "temp-directory": "./coverage/.nyc_output"
 }
