@@ -13,6 +13,7 @@ export class clitask {
             let releaseDir: string = process.env.AGENT_RELEASEDIRECTORY as string //ADO defaults to this value for recipeArtifact
             const recipeName: string = tl.getInput('recipe', false)
             const recipeArtifact: string = (tl.getInput('recipeArtifact', false) === releaseDir) ? "" : tl.getInput('recipeArtifact', false)
+            console.log("Is recipeArtifact specified:" + !(tl.getInput('recipeArtifact', false) === releaseDir))
 
             if (recipeName && recipeArtifact) {
                 throw new Error('Both recipe and bake artifact file are defined, only one can be set')
@@ -32,6 +33,9 @@ export class clitask {
 
     }
     static deployImage(recipe: string, recipeFile: string): void {
+
+        console.log("recipe: " + recipe)
+        console.log("recipeFile: " + recipeFile)
 
         if (recipeFile) {
             let contents = fs.readFileSync(recipeFile)
