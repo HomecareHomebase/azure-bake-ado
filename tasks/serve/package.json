@@ -1,7 +1,8 @@
 {
   "name": "Azure-Bake-Serve",
-  "version": "0.1.20",
+  "version": "1.0.0",
   "description": "A plugin to use the Bake IaC deployment system for Azure",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/HomecareHomebase/azure-bake-ado"
@@ -9,9 +10,11 @@
   "author": "HomecareHomebase",
   "license": "ISC",
   "dependencies": {
-    "azure-pipelines-task-lib": "^2.8.0",
     "@types/node": "^11.13.2",
-    "@types/q": "^1.5.2"
+    "@types/q": "^1.5.2",
+    "azure-pipelines-task-lib": "^2.8.0",
+    "docker-cli-js": "^2.5.2",
+    "only": "0.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

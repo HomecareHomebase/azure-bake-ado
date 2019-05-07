@@ -1,18 +1,17 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as path from 'path'
 import * as fs from 'fs'
-import {Buffer} from 'buffer'
+import { Buffer } from 'buffer'
 import { IExecOptions } from 'azure-pipelines-task-lib/toolrunner';
-var dockerCLI = require('docker-cli-js');
-var DockerOptions = dockerCLI.Options;
-var Docker = dockerCLI.Docker;
+import * as dockerCLI from 'docker-cli-js';
 tl.setResourcePath(path.join(__dirname, 'task.json'));
+let docker = new dockerCLI.Docker(new dockerCLI.Options(process.env.AGENT_MACHINENAME, process.env.BUILD_REPOSITORY_LOCALPATH))
 
 export class clitask {
 
-    public static async runMain(){
+    public static async runMain() {
 
-        try{
+        try {
             let releaseDir: string = process.env.AGENT_RELEASEDIRECTORY as string //ADO defaults to this value for recipeArtifact
             const recipeName: string = tl.getInput('recipe', false)
             const recipeArtifact: string = (tl.getInput('recipeArtifact', false) === releaseDir) ? "" : tl.getInput('recipeArtifact', false)
@@ -30,7 +29,7 @@ export class clitask {
             this.setupEnvironment()
 
             this.deployImage(recipeName, recipeArtifact)
-        } catch (err){
+        } catch (err) {
             tl.setResult(tl.TaskResult.Failed, err.message);
         }
 
@@ -50,49 +49,56 @@ export class clitask {
 
         let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
 
-        let envContent = "BAKE_ENV_NAME="+process.env.BAKE_ENV_NAME+"\r\n" +
-        "BAKE_ENV_CODE="+process.env.BAKE_ENV_CODE+"\r\n" +
-        "BAKE_ENV_REGIONS="+process.env.BAKE_ENV_REGIONS+"\r\n" +
-        "BAKE_AUTH_SUBSCRIPTION_ID="+process.env.BAKE_AUTH_SUBSCRIPTION_ID+"\r\n" +
-        "BAKE_AUTH_TENANT_ID="+process.env.BAKE_AUTH_TENANT_ID+"\r\n" +
-        "BAKE_AUTH_SERVICE_ID="+process.env.BAKE_AUTH_SERVICE_ID+"\r\n" +
-        "BAKE_AUTH_SERVICE_CERT="+(process.env.BAKE_AUTH_SERVICE_CERT||"")+"\r\n" +
-        "BAKE_AUTH_SERVICE_KEY="+(process.env.BAKE_AUTH_SERVICE_KEY||"")+"\r\n" +
-        "BAKE_VARIABLES64="+(process.env.BAKE_VARIABLES64||"")+"\r\n"    
+        let envContent = "BAKE_ENV_NAME=" + process.env.BAKE_ENV_NAME + "\r\n" +
+            "BAKE_ENV_CODE=" + process.env.BAKE_ENV_CODE + "\r\n" +
+            "BAKE_ENV_REGIONS=" + process.env.BAKE_ENV_REGIONS + "\r\n" +
+            "BAKE_AUTH_SUBSCRIPTION_ID=" + process.env.BAKE_AUTH_SUBSCRIPTION_ID + "\r\n" +
+            "BAKE_AUTH_TENANT_ID=" + process.env.BAKE_AUTH_TENANT_ID + "\r\n" +
+            "BAKE_AUTH_SERVICE_ID=" + process.env.BAKE_AUTH_SERVICE_ID + "\r\n" +
+            "BAKE_AUTH_SERVICE_CERT=" + (process.env.BAKE_AUTH_SERVICE_CERT || "") + "\r\n" +
+            "BAKE_AUTH_SERVICE_KEY=" + (process.env.BAKE_AUTH_SERVICE_KEY || "") + "\r\n" +
+            "BAKE_VARIABLES64=" + (process.env.BAKE_VARIABLES64 || "") + "\r\n"
 
-        fs.writeFileSync(envFile,envContent)
+        fs.writeFileSync(envFile, envContent)
 
-        // docker login
-        dockerCLI.command('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + '-p ' + process.env.BAKE_AUTH_SERVICE_KEY).then(function (data) {
-            console.log('data = ', data);
-            // Successful login
-           }, function (rejected) {
-               console.log('rejected = ', rejected);
-               // Failed login
-           });
+        let reg: string = "/^(.*)[\/.*]/g"
+        let remoteRegistry = recipe.match(reg)
+
+        if (remoteRegistry && !recipeFile) {
+
+            // docker login
+            console.log(remoteRegistry[1])
+            docker.command('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + '-p ' + process.env.BAKE_AUTH_SERVICE_KEY + ' ' + remoteRegistry[1]).then(function (data) {
+                console.log('data = ', data);
+                //Docker Successful login
+            }, function (rejected) {        
+                //Docker Failed login
+                console.log('rejected = ', rejected);
+                throw new Error('Docker Login Failed: ' + rejected)
+            });
+        }
 
         //clear out current env vars now
         process.env.BAKE_ENV_NAME = process.env.BAKE_ENV_CODE = process.env.BAKE_ENV_REGIONs = process.env.BAKE_AUTH_SUBSCRIPTION_ID =
-        process.env.BAKE_AUTH_TENANT_ID = process.env.BAKE_AUTH_SERVICE_ID = process.env.BAKE_AUTH_SERVICE_KEY = process.env.BAKE_AUTH_SERVICE_CERT =
-        process.env.BAKE_VARIABLES64 = ""
+            process.env.BAKE_AUTH_TENANT_ID = process.env.BAKE_AUTH_SERVICE_ID = process.env.BAKE_AUTH_SERVICE_KEY = process.env.BAKE_AUTH_SERVICE_CERT =
+            process.env.BAKE_VARIABLES64 = ""
 
         let p = tool.arg('run').arg('--rm').arg('-t')
-                .arg('--env-file=' + envFile)
-                .arg(recipe)
-                .exec()
+            .arg('--env-file=' + envFile)
+            .arg(recipe)
+            .exec()
 
-            p.then((code)=>{
-                this.cleanupAndExit(envFile, code)
-            }, (err)=>{
-                this.cleanupAndExit(envFile, 2)
-            })            
-        
+        p.then((code) => {
+            this.cleanupAndExit(envFile, code)
+        }, (err) => {
+            this.cleanupAndExit(envFile, 2)
+        })
+
     }
 
-    static cleanupAndExit(envFile: string, exitCode: number){
+    static cleanupAndExit(envFile: string, exitCode: number) {
         fs.unlinkSync(envFile)
-        if (exitCode != 0)
-        {
+        if (exitCode != 0) {
             tl.setResult(tl.TaskResult.Failed, "Deployment Failed");
             process.exit(exitCode)
         }
@@ -105,42 +111,39 @@ export class clitask {
 
         if (!envName) {
             envName = process.env.BAKE_ENV_NAME || ""
-            if (!envName)
-            {
+            if (!envName) {
                 throw new Error("Environment Name is required");
             }
         }
 
-        if (!envCode){
+        if (!envCode) {
             envCode = process.env.BAKE_ENV_CODE || ""
-            if (!envCode)
-            {
+            if (!envCode) {
                 throw new Error("Environment Code is required");
             }
         }
 
         if (!envRegions) {
             envRegions = process.env.BAKE_ENV_REGIONS || ""
-            if (!envRegions)
-            {
+            if (!envRegions) {
                 throw new Error("Deployment Regions are required");
             }
         }
 
         //gather up all environment variables.
-        let bakeVars : string = ""
-        for(let envvar in process.env){
+        let bakeVars: string = ""
+        for (let envvar in process.env) {
             if (!envvar.toLocaleUpperCase().startsWith("BAKE_") &&
                 !envvar.toLocaleUpperCase().startsWith("ENDPOINT_") &&
-                !envvar.toLocaleUpperCase().startsWith("INPUT_") )
-            bakeVars += envvar + ": '" + process.env[envvar] +"'\n"
+                !envvar.toLocaleUpperCase().startsWith("INPUT_"))
+                bakeVars += envvar + ": '" + process.env[envvar] + "'\n"
         }
         let b64 = Buffer.from(bakeVars, 'ascii').toString('base64')
 
         console.log('Setting environment for %s (%s)', envName, envCode)
         process.env.BAKE_ENV_NAME = envName
         process.env.BAKE_ENV_CODE = envCode
-        process.env.BAKE_ENV_REGIONS = envRegions 
+        process.env.BAKE_ENV_REGIONS = envRegions
         process.env.BAKE_VARIABLES64 = b64
     }
 
@@ -177,8 +180,8 @@ export class clitask {
         process.env.BAKE_AUTH_SERVICE_CERT = cliPasswordPath
 
         console.log('Setting up authentication for SUBID=%s TID=%s', subscriptionID, tenantId)
-        
-    } 
+
+    }
 }
 
 

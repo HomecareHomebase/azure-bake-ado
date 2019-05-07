@@ -9,6 +9,28 @@ var sonarqubeScanner = require('sonarqube-scanner');
 
 var IsRunningOnVsts = !!process.env.AGENT_ID;
 
+function bumpVersion() {
+	return es.map((file, cb) => {
+		let taskJsonPath = file.history[0];
+		if (taskJsonPath) {
+			console.log("Bumping version for task: " + taskJsonPath);
+			var taskJson = JSON.parse(fs.readFileSync(taskJsonPath));
+			if (typeof taskJson.version.Patch != 'number') {
+				fail(`Error processing '${name}'. version.Patch should be a number.`);
+			}
+
+			taskJson.version.Patch = taskJson.version.Patch + 1;
+			fs.writeFileSync(taskJsonPath, JSON.stringify(taskJson, null, 4));
+		}
+		cb(null, file);
+	});
+}
+
+gulp.task('bump-version', function () {
+	return gulp.src(['tasks/**/task.json'])
+		.pipe(bumpVersion())
+});
+
 gulp.task('clean-coverage', () => {
 	return del('coverage/**', { force: true });
 });

@@ -9,7 +9,7 @@
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch":  20
+        "Patch": 31
     },
     "instanceNameFormat": "Azure Bake Serve",
     "showEnvironmentVariables": true,
@@ -32,31 +32,31 @@
             "label": "Azure Connection",
             "required": true,
             "helpMarkDown": "Select an Azure resource manager subscription for the deployment",
-            "groupName":"env"
+            "groupName": "env"
         },
         {
             "name": "envName",
-            "type":"string",
-            "label":"Environment Name",
-            "required":false,
-            "helpMarkDown":"If this is not assigned, will look for the pipeline variable: BAKE_ENV_NAME",
-            "groupName":"env"
+            "type": "string",
+            "label": "Environment Name",
+            "required": false,
+            "helpMarkDown": "If this is not assigned, will look for the pipeline variable: BAKE_ENV_NAME",
+            "groupName": "env"
         },
         {
             "name": "envCode",
-            "type":"string",
-            "label":"Environment Code",
-            "required":false,
-            "helpMarkDown":"If this is not assigned, will look for the pipeline variable: BAKE_ENV_CODE",
-            "groupName":"env"
+            "type": "string",
+            "label": "Environment Code",
+            "required": false,
+            "helpMarkDown": "If this is not assigned, will look for the pipeline variable: BAKE_ENV_CODE",
+            "groupName": "env"
         },
         {
             "name": "envRegions",
-            "type":"string",
-            "label":"Deployment Regions",
-            "required":false,
-            "helpMarkDown":"If this is not assigned, will look for the pipeline variable: BAKE_ENV_REGIONS",
-            "groupName":"env"
+            "type": "string",
+            "label": "Deployment Regions",
+            "required": false,
+            "helpMarkDown": "If this is not assigned, will look for the pipeline variable: BAKE_ENV_REGIONS",
+            "groupName": "env"
         },
         {
             "name": "recipe",
@@ -64,7 +64,7 @@
             "label": "Bake Recipe Docker Tag",
             "required": false,
             "helpMarkDown": "Either define a recipe docker tag, or use the field below to define the Devops artifact bake.artifact file",
-            "groupName":"general"
+            "groupName": "general"
         },
         {
             "name": "recipeArtifact",
@@ -72,7 +72,7 @@
             "label": "Bake Recipe Artifact File",
             "helpMarkDown": "Path to an attached Devops bake.artifact file from an attached Artifact drop. If not defined, Recipe field above is used",
             "required": false,
-            "groupName":"general"
+            "groupName": "general"
         }
     ],
     "execution": {
