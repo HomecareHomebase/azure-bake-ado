@@ -24,6 +24,7 @@
         "build:tasks": "npm run compile:tasks",
         "clean": "git clean -fdX",
         "package": "npm run tfx:install && npm run package:tasks",
+        "prod:build:package": "prod:clean:build && npm run tfx:install && npm run package:tasks",
         "package:upload": "npm run tfx:install && npm run prod:clean:build && tfx extension publish --root . --share-with ${SHARE_ORG} --token ${ADO_TOKEN} --root . --output-path dist --manifest-globs vss-extension.json --rev-version",
         "tfx:install": "npm install --global tfx-cli"
     },

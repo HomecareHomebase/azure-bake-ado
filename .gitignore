@@ -1,6 +1,6 @@
 *.vsix
-*.js
-*.js.map
+/tasks/**/*.js
+/tasks/**/*.js.map
 tools/**
 !tools/packages.config
 artifacts/
