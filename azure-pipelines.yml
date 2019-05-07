@@ -13,15 +13,15 @@ pr:
     - master
     - release/v*
 pool:
-  vmImage: 'vs2017-win2016'
+  vmImage: 'ubuntu-16.04'
 steps:
 - powershell: 'Get-ChildItem Env:'
   displayName: 'Get-ChildItem Env:'
 - task: PowerShell@2
-  displayName: 'Cake Build'
+  displayName: 'NPM Build'
   inputs:
     targetType: filePath
-    filePath: ./build.ps1
+    filePath: ./npm run prod:full
     arguments: '-Target $(Target) -Configuration $(Configuration) -Verbosity $(Verbosity)'
   env:
     GITHUB_TOKEN: $(GitHubToken)
