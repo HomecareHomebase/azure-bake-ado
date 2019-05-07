@@ -12,13 +12,13 @@ export class clitask {
         try{
             let releaseDir: string = process.env.AGENT_RELEASEDIRECTORY as string //ADO defaults to this value for recipeArtifact
             const recipeName: string = tl.getInput('recipe', false)
-            const recipeArtifact: string = tl.getInput('recipeArtifact', false)
+            const recipeArtifact: string = (tl.getInput('recipeArtifact', false) === releaseDir) ? "" : tl.getInput('recipeArtifact', false)
 
-            if (recipeName && (recipeArtifact !== releaseDir)) {
+            if (recipeName && recipeArtifact) {
                 throw new Error('Both recipe and bake artifact file are defined, only one can be set')
             }
 
-            if ((recipeArtifact === releaseDir) && !recipeName) {
+            if (!recipeArtifact && !recipeName) {
                 throw new Error('One of recipe or bake artifact file must be defined')
             }
 
