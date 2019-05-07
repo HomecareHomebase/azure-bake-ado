@@ -3,6 +3,9 @@ import * as path from 'path'
 import * as fs from 'fs'
 import {Buffer} from 'buffer'
 import { IExecOptions } from 'azure-pipelines-task-lib/toolrunner';
+var dockerCLI = require('docker-cli-js');
+var DockerOptions = dockerCLI.Options;
+var Docker = dockerCLI.Docker;
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 
 export class clitask {
@@ -58,6 +61,15 @@ export class clitask {
         "BAKE_VARIABLES64="+(process.env.BAKE_VARIABLES64||"")+"\r\n"    
 
         fs.writeFileSync(envFile,envContent)
+
+        // docker login
+        dockerCLI.command('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + '-p ' + process.env.BAKE_AUTH_SERVICE_KEY).then(function (data) {
+            console.log('data = ', data);
+            // Successful login
+           }, function (rejected) {
+               console.log('rejected = ', rejected);
+               // Failed login
+           });
 
         //clear out current env vars now
         process.env.BAKE_ENV_NAME = process.env.BAKE_ENV_CODE = process.env.BAKE_ENV_REGIONs = process.env.BAKE_AUTH_SUBSCRIPTION_ID =
