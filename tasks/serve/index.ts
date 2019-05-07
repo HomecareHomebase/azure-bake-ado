@@ -5,7 +5,7 @@ import { Buffer } from 'buffer'
 import { IExecOptions } from 'azure-pipelines-task-lib/toolrunner';
 import * as dockerCLI from 'docker-cli-js';
 tl.setResourcePath(path.join(__dirname, 'task.json'));
-let docker = new dockerCLI.Docker(new dockerCLI.Options(process.env.AGENT_MACHINENAME, process.env.BUILD_REPOSITORY_LOCALPATH))
+//let docker = new dockerCLI.Docker()
 
 export class clitask {
 
@@ -36,16 +36,20 @@ export class clitask {
     }
     static deployImage(recipe: string, recipeFile: string): void {
 
-        console.log("recipe: " + recipe)
-        console.log("recipeFile: " + recipeFile)
-
         if (recipeFile) {
             let contents = fs.readFileSync(recipeFile)
             recipe = contents.toString()
             console.log('Deploying Bake recipe via Artifact output | ' + recipe)
-        }
+        }        
 
-        let tool = tl.tool('docker')
+        //RegEx to determine if it is local or remote Docker Registry
+        let remoteRegistry = recipe.match(/(.*)[\/.*]/)
+        let login = tl.tool('docker')
+
+        if (remoteRegistry && !recipeFile) {
+            console.log("Logging into registry at: " + remoteRegistry[1])
+            let l = login.arg('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + ' -p ' + process.env.BAKE_AUTH_SERVICE_KEY + ' ' + remoteRegistry[1]).exec()        
+        }
 
         let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
 
@@ -59,30 +63,14 @@ export class clitask {
             "BAKE_AUTH_SERVICE_KEY=" + (process.env.BAKE_AUTH_SERVICE_KEY || "") + "\r\n" +
             "BAKE_VARIABLES64=" + (process.env.BAKE_VARIABLES64 || "") + "\r\n"
 
-        fs.writeFileSync(envFile, envContent)
-
-        let reg: string = "/^(.*)[\/.*]/g"
-        let remoteRegistry = recipe.match(reg)
-
-        if (remoteRegistry && !recipeFile) {
-
-            // docker login
-            console.log(remoteRegistry[1])
-            docker.command('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + '-p ' + process.env.BAKE_AUTH_SERVICE_KEY + ' ' + remoteRegistry[1]).then(function (data) {
-                console.log('data = ', data);
-                //Docker Successful login
-            }, function (rejected) {        
-                //Docker Failed login
-                console.log('rejected = ', rejected);
-                throw new Error('Docker Login Failed: ' + rejected)
-            });
-        }
+        fs.writeFileSync(envFile, envContent)        
 
         //clear out current env vars now
         process.env.BAKE_ENV_NAME = process.env.BAKE_ENV_CODE = process.env.BAKE_ENV_REGIONs = process.env.BAKE_AUTH_SUBSCRIPTION_ID =
             process.env.BAKE_AUTH_TENANT_ID = process.env.BAKE_AUTH_SERVICE_ID = process.env.BAKE_AUTH_SERVICE_KEY = process.env.BAKE_AUTH_SERVICE_CERT =
             process.env.BAKE_VARIABLES64 = ""
-
+        
+        let tool = tl.tool('docker')
         let p = tool.arg('run').arg('--rm').arg('-t')
             .arg('--env-file=' + envFile)
             .arg(recipe)

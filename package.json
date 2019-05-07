@@ -27,7 +27,7 @@
         "clean:build:test": "npm run clean && npm run dev:init && npm run build:lint && npm run test",
         "prod:clean:build": "npm run clean && npm run prod:init && npm run build",
         "prod:build:package": "npm run prod:clean:build && npm run tfx:install && npm run package:tasks",
-        "prod:package:upload": "gulp bump-version && npm run prod:clean:build && npm run tfx:install && tfx extension publish --root . --share-with hchb --token ${VSMARKETPLACETOKEN}  --root . --output-path dist --manifest-globs vss-extension.json --rev-version",
+        "prod:package:upload": "gulp bump-version && npm run tfx:install && tfx extension publish --root . --share-with hchb --token ${token} --root . --output-path dist --manifest-globs vss-extension.json --rev-version",
         "prod:full": "npm run clean:build:test && npm run sonarqube && npm run prod:package:upload",
         "tfx:install": "npm remove tfx-cli && npm install --global tfx-cli"
     },
