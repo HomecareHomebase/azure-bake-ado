@@ -8,10 +8,11 @@
     "url": "https://github.com/HomecareHomebase/azure-bake-ado"
   },
   "scripts": {
+    "init": "npm install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "cmd /c powershell.exe -Command { Remove-Item ./dist -recurse -force; Remove-Item ./node_modules -recurse -force } && npm install",
-    "compile": "tsc -b",
-    "clean:build": "npm run clean && npm run compile"
+    "clean": "git clean -fdX",
+    "compile": "tsc -b .",
+    "clean:build": "npm run clean && npm run init && npm run compile"
   },
   "author": "HomecareHomebase",
   "license": "ISC",

@@ -1,11 +1,12 @@
-var gulp = require('gulp');
-var es = require('event-stream');
-var del = require('del');
-var fs = require('fs');
-var inlinesource = require('gulp-inline-source');
-var argv = require('yargs').argv;
-var moment = require('moment');
-var sonarqubeScanner = require('sonarqube-scanner');
+const gulp = require('gulp');
+const shell = require('gulp-shell');
+const es = require('event-stream');
+const del = require('del');
+const fs = require('fs');
+const inlinesource = require('gulp-inline-source');
+const argv = require('yargs').argv;
+const moment = require('moment');
+const sonarqubeScanner = require('sonarqube-scanner');
 
 var IsRunningOnVsts = !!process.env.AGENT_ID;
 
@@ -38,7 +39,7 @@ gulp.task('clean-coverage', () => {
 // write a list of filenames to a text file
 // this sets up a file that includes all of the ts files, to ensure code coverage numbers include everything
 function writeFilenameToFile() {
-	let output = fs.createWriteStream(__dirname + '/app.spec.ts');
+	let output = fs.createWriteStream(__dirname + '/test/app.spec.ts');
 	output.write('// I am an automatically generated file. I help ensure that unit tests have accurate code coverage numbers. You can ignore me.\n\n')
 
 	return es.map((file, cb) => {
@@ -55,6 +56,8 @@ gulp.task('setup-coverage-pool', function () {
 	return gulp.src(['tasks/**/*.ts', '!tasks/**/tests.ts', '!tasks/**/node_modules/**/*'])
 		.pipe(writeFilenameToFile())
 });
+
+gulp.task('test-nyc-mocha', shell.task(['nyc mocha --opts test/mocha.opts']));
 
 // print a command for VSTS to pick up the build number
 gulp.task('print-version', function () {
@@ -88,6 +91,12 @@ gulp.task('inline-coverage-source', function () {
 		.pipe(inlinesource({ attribute: false }))
 		.pipe(gulp.dest('./coverage/inline-html'));
 });
+
+gulp.task('tfx-install', shell.task(['npm remove tfx-cli && npm install --global tfx-cli']));
+
+gulp.task('package', gulp.series('tfx-install', shell.task(['tfx extension create --root . --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version'])));
+
+gulp.task('publish', gulp.series('tfx-install', shell.task(['tfx extension publish --root . --share-with ' + process.env.ORGSHARE +' --token ' + process.env.VSMARKETPLACETOKEN + ' --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version'])));
 
 //this task is meant to only run from VSTS builds, not local builds
 gulp.task('analysis', done => {
@@ -133,4 +142,8 @@ gulp.task('analysis', done => {
 
 gulp.task('pretest', gulp.series('clean-coverage', 'setup-coverage-pool'));
 
-gulp.task('full:analysis', gulp.series('pretest', 'inline-coverage-source', 'analysis'));
+gulp.task('test-coverage', gulp.series('clean-coverage', 'setup-coverage-pool', 'test-nyc-mocha'));
+
+gulp.task('test-coverage-sonarqube', gulp.series('clean-coverage', 'setup-coverage-pool', 'test-nyc-mocha', 'analysis'));
+
+gulp.task('upload-extension', gulp.series('bump-version', 'publish'));

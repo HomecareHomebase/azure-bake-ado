@@ -7,14 +7,19 @@
     "type": "git",
     "url": "https://github.com/HomecareHomebase/azure-bake-ado"
   },
+  "scripts": {
+    "init": "npm install",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "git clean -fdX",
+    "compile": "tsc -b .",
+    "clean:build": "npm run clean && npm run init && npm run compile"
+  },
   "author": "HomecareHomebase",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^11.13.2",
-    "@types/q": "^1.5.2",
     "azure-pipelines-task-lib": "^2.8.0",
-    "docker-cli-js": "^2.5.2",
-    "only": "0.0.2"
+    "@types/node": "^11.13.1",
+    "@types/q": "^1.5.2"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

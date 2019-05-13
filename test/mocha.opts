@@ -1,6 +1,5 @@
-tasks/**/tests.ts
+test/test.ts
 --colors
 --require ts-node/register
 --require source-map-support/register
 --recursive
-tasks/**/index.ts

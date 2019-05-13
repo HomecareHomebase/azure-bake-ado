@@ -3,7 +3,6 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { Buffer } from 'buffer'
 import { IExecOptions } from 'azure-pipelines-task-lib/toolrunner';
-import * as dockerCLI from 'docker-cli-js';
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 //let docker = new dockerCLI.Docker()
 
@@ -42,14 +41,14 @@ export class clitask {
             console.log('Deploying Bake recipe via Artifact output | ' + recipe)
         }        
 
-        //RegEx to determine if it is local or remote Docker Registry
+        /*RegEx to determine if it is local or remote Docker Registry
         let remoteRegistry = recipe.match(/(.*)[\/.*]/)
         let login = tl.tool('docker')
 
         if (remoteRegistry && !recipeFile) {
             console.log("Logging into registry at: " + remoteRegistry[1])
             let l = login.arg('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + ' -p ' + process.env.BAKE_AUTH_SERVICE_KEY + ' ' + remoteRegistry[1]).exec()        
-        }
+        }*/
 
         let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
 
