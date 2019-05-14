@@ -1,7 +1,11 @@
-node_modules/
 *.vsix
-tasks/**/*.js
-
+/tasks/**/*.js
+/tasks/**/*.js.map
 tools/**
 !tools/packages.config
 artifacts/
+coverage/
+.nyc_output/
+dist/
+node_modules/
+app.spec.ts

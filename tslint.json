@@ -1,0 +1,22 @@
+{
+  "extends": "typestrict",
+  "rules": {
+    "no-unused-variable": false,
+    "no-floating-promises": {
+      "severity": "warning",
+      "options": [
+        true,
+        "Promise",
+        "Q.Promise"
+      ]
+    }
+  },
+  "extends": "tslint",
+  "cliOptions": {
+    "exclude": [
+      "node_modules",
+      "node_modules/**"
+    ]
+  }
+
+}
