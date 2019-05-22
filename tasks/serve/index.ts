@@ -25,6 +25,7 @@ export class clitask {
             }
 
             this.setupCredentials()
+            this.setupKubernetesConfig()
             this.setupEnvironment()
 
             this.deployImage(recipeName, recipeArtifact)
@@ -132,6 +133,41 @@ export class clitask {
         process.env.BAKE_ENV_CODE = envCode
         process.env.BAKE_ENV_REGIONS = envRegions
         process.env.BAKE_VARIABLES64 = b64
+        
+    }
+
+    static setupKubernetesConfig(): void {
+        let useKubernetes: boolean = tl.getBoolInput("useKubernetes", true)
+        let configToken: string = tl.getInput("kubeConfigToken", false)
+
+        if (!useKubernetes) {
+            return
+        }
+
+        //curently, we integrate with current kuberenetes V1 task that sets a global env var of "KUBECONFIG" to the
+        //path of the k8s config file with context already set (assume login command task run)
+
+        //in future we might pull in the k8s connection code and setup the config ourselves.
+
+        let kubeConfig = tl.getVariable("KUBECONFIG")
+        if (!kubeConfig){
+            tl.error("KUBECONFIG variable is not defined, can't bundle config file!")
+            throw new Error()
+        }
+
+        if (!fs.existsSync(kubeConfig)) {
+            tl.error("$(kubeConfig) doesn't exist, can't bundle config file!")
+            throw new Error()
+        }
+
+        if (!configToken){
+            tl.error("Did not define a token for config data, can't bundle config file!")
+            throw new Error()
+        }
+
+        let data = fs.readFileSync(kubeConfig)
+        let base64 = data.toString('base64')
+        process.env[configToken] = base64
     }
 
     static setupCredentials(): void {
