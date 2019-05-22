@@ -59,6 +59,24 @@
             "groupName": "env"
         },
         {
+            "name": "useKubernetes",
+            "type": "boolean",
+            "label": "Deployment Regions",
+            "required": true,
+            "helpMarkDown": "Bundle the kubernetes config (must run k8 task login first) into the deployment",
+            "groupName": "env"
+        },
+        {
+            "name": "configToken",
+            "type": "string",
+            "label": "Deployment Regions",
+            "required": false,
+            "helpMarkDown": "name of the BAKE varibale to store the kube config content",
+            "groupName": "env",
+            "defaultValue": "k8s_config",
+            "visibleRule":"useKubernetes = true"
+        },
+        {
             "name": "recipe",
             "type": "string",
             "label": "Bake Recipe Docker Tag",
