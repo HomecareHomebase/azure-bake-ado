@@ -20,9 +20,8 @@ steps:
 - task: PowerShell@2
   displayName: 'NPM Build'
   inputs:
-    targetType: filePath
-    filePath: ./npm run prod:full
-    arguments: '-Target $(Target) -Configuration $(Configuration) -Verbosity $(Verbosity)'
+    targetType: 'inline'
+    script: 'npm run prod:full'
   env:
-    GITHUB_TOKEN: $(GitHubToken)
-    VS_MARKETPLACE_TOKEN: $(VsMarketplaceToken)
+    GITHUBTOKEN: $(GitHubToken)
+    VSMARKETPLACETOKEN: $(VsMarketplaceToken)

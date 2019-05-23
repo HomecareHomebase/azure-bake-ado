@@ -9,7 +9,7 @@
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch": 42
+        "Patch": 43
     },
     "instanceNameFormat": "Azure Bake Serve",
     "showEnvironmentVariables": true,
@@ -74,7 +74,7 @@
             "helpMarkDown": "name of the BAKE varibale to store the kube config content",
             "groupName": "env",
             "defaultValue": "k8s_config",
-            "visibleRule":"useKubernetes = true"
+            "visibleRule": "useKubernetes = true"
         },
         {
             "name": "recipe",
