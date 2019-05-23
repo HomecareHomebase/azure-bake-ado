@@ -143,10 +143,6 @@ gulp.task('analysis', done => {
 	}
 });
 
-function gitAddCommit () {
-	
-}
-
 gulp.task('git-add-commit', function (done) { 
 	var add = exec('git add --a');
 	var commit = exec('git commit -a -m "[CHORE] Update & Publish"');
