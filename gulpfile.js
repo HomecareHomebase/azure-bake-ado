@@ -1,4 +1,7 @@
+const exec = require('child_process').exec;
+const git = require('gulp-git');
 const gulp = require('gulp');
+const merge = require('merge-stream');
 const shell = require('gulp-shell');
 const es = require('event-stream');
 const del = require('del');
@@ -138,6 +141,16 @@ gulp.task('analysis', done => {
 			options: sonarOptions
 		}, callback);
 	}
+});
+
+function gitAddCommit () {
+	
+}
+
+gulp.task('git-add-commit', function (done) { 
+	var add = exec('git add --a');
+	var commit = exec('git commit -a -m "[CHORE] Update & Publish"');
+	done();
 });
 
 gulp.task('pretest', gulp.series('clean-coverage', 'setup-coverage-pool'));
