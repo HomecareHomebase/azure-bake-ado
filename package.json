@@ -7,7 +7,7 @@
     "repository": "https://github.com/HomecareHomebase/azure-bake-ado",
     "scripts": {
         "prod:init": "npm run prod:base:init && npm run prod:tasks:init",
-        "prod:base:init": "npm install--no-progress --no-update-notifier",
+        "prod:base:init": "npm install --no-progress --no-update-notifier",
         "prod:tasks:init": "npx glob-exec --parallel --foreach \"tasks/**/tsconfig.json\" -- \"cd {{file.dir}} && npm install --only=prod --no-update-notifier --no-progress\"",
         "dev:init": "npm run initdev:npm",
         "initdev:npm": "npm run initdev:npm:base & npm run initdev:npm:tasks",
