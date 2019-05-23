@@ -156,7 +156,7 @@ gulp.task('test-coverage', gulp.series('clean-coverage', 'setup-coverage-pool', 
 gulp.task('test-coverage-sonarqube', gulp.series('clean-coverage', 'setup-coverage-pool', 'test-nyc-mocha', 'analysis'));
 
 gulp.task('upload-extension', function (done) { 
-	if (IsRunningOnVsts && !process.env.BUILD_REASON === 'PullRequest') {
+	if (IsRunningOnVsts && process.env.BUILD_REASON != 'PullRequest') {
 		gulp.series('bump-version', 'publish', 'git-add-commit');
 	}
 	done();
