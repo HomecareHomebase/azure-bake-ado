@@ -58,7 +58,7 @@ function printVersion(done) {
 }
 
 function packageExtension(done) {
-    var child = exec('tfx extension create --root . --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version');
+    var child = exec('sudo tfx extension create --root . --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version');
     child.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
     });
@@ -76,7 +76,7 @@ function packageExtension(done) {
 }
 
 function publishExtension(done) {
-    var child = exec('tfx extension publish --root . --share-with ' + process.env.ORGSHARE +' --token ' + process.env.VSMARKETPLACETOKEN + ' --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version');
+    var child = exec('sudo tfx extension publish --root . --share-with ' + process.env.ORGSHARE +' --token ' + process.env.VSMARKETPLACETOKEN + ' --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version');
     child.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
     });
@@ -141,7 +141,7 @@ function testNycMocha(done) {
 }
 
 function tfxInstall(done) {
-    var child = exec("npm remove tfx-cli && npm install --global tfx-cli");
+    var child = exec("sudo npm remove tfx-cli && sudo npm install --global tfx-cli");
     child.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
     });
@@ -195,6 +195,7 @@ exports.pretest = gulp.series(cleanCoverage, setupCoveragePool);
 exports.printversion = printVersion;
 exports.publish = publishExtension;
 exports.setupcoveragepool = setupCoveragePool;
+exports.publish = gulp.series(tfxInstall, uploadExtension)
 exports.testnycmocha = testNycMocha;
 exports.tfxinstall = tfxInstall;
 exports.upload = uploadExtension;
