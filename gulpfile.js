@@ -1,16 +1,15 @@
-var exec = require('child_process').exec;
+const exec = require('child_process').exec;
+const del = require('del');
+const es = require('event-stream');
+const fs = require('file-system');
 const gulp = require('gulp');
+const debug = require('gulp-debug');
+const inlinesource = require('gulp-inline-source');
+const moment = require('moment');
+const params = require('./build/parameters');
 const shell = require('gulp-shell');
 const vstsBump = require('gulp-vsts-bump');
-const fs = require('file-system');
-const es = require('event-stream');
-const debug = require('gulp-debug');
-const del = require('del');
-const moment = require('moment');
-const inlinesource = require('gulp-inline-source');
-const params = require('./build/parameters');
 
-console.log('Is It a Local Build? ' + params.isRunningOnADO);
 function bumpVersion() {
     return gulp.src(['tasks/**/task.json'], { base: './' })
         .pipe(vstsBump({ type: 'patch' }))
