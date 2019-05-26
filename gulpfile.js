@@ -82,7 +82,6 @@ function publishExtension(done) {
     });
     child.stderr.on('data', function (data) {
         console.log('stderr: ' + data);
-        done(errors);
     });
     child.on('error', function (errors) {
         console.log('Comand Errors: ' + errors);
