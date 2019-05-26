@@ -9,7 +9,6 @@ const del = require('del');
 const moment = require('moment');
 const inlinesource = require('gulp-inline-source');
 const params = require('./build/parameters');
-const spawn = require('child_process').spawn;
 
 console.log('Is It a Local Build? ' + params.isRunningOnADO);
 function bumpVersion() {
@@ -69,7 +68,7 @@ function packageExtension(done) {
     });
     child.on('error', function (errors) {
         console.log('Comand Errors: ' + errors);
-        error(errors);
+        done(errors);
     });
     child.on('close', function (code) {
         console.log('closing code: ' + code);
@@ -84,10 +83,11 @@ function publishExtension(done) {
     });
     child.stderr.on('data', function (data) {
         console.log('stderr: ' + data);
+        done(errors);
     });
     child.on('error', function (errors) {
         console.log('Comand Errors: ' + errors);
-        error(errors);
+        done(errors);
     });
     child.on('close', function (code) {
         console.log('closing code: ' + code);
@@ -152,7 +152,7 @@ function tfxInstall(done) {
     });
     child.on('error', function (errors) {
         console.log('Comand Errors: ' + errors);
-        error(errors);
+        done(errors);
     });
     child.on('close', function (code) {
         console.log('closing code: ' + code);
@@ -181,18 +181,20 @@ function writeFilenameToFile() {
     });
 }
 
-exports.coverage = gulp.series(cleanCoverage, setupCoveragePool, testNycMocha);
-exports.pretest = gulp.series(cleanCoverage, setupCoveragePool);
+//Tasks
 exports.analysis = gulp.series(sonarQube);
-exports.package = gulp.series(tfxInstall, packageExtension);
-exports.publish = gulp.series(tfxInstall, publishExtension);
 exports.bump = bumpVersion;
 exports.commit = gitAddCommit;
 exports.cleancoverage = cleanCoverage;
-exports.setupcoveragepool = setupCoveragePool;
+exports.coverage = gulp.series(cleanCoverage, setupCoveragePool, testNycMocha);
+exports.coveragesonarqube = gulp.series(cleanCoverage, setupCoveragePool, testNycMocha, sonarQube);
 exports.inlinecoveragesource = inlineCoverageSource;
+exports.package = gulp.series(tfxInstall, packageExtension);
 exports.packageextension = packageExtension;
+exports.pretest = gulp.series(cleanCoverage, setupCoveragePool);
 exports.printversion = printVersion;
+exports.publish = gulp.series(tfxInstall, publishExtension);
+exports.setupcoveragepool = setupCoveragePool;
 exports.testnycmocha = testNycMocha;
 exports.tfxinstall = tfxInstall;
 exports.upload = uploadExtension;
