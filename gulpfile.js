@@ -159,10 +159,12 @@ function tfxInstall(done) {
 }
 
 function uploadExtension (done) {
-    if (true) {
+    if (!params.isPullRequest && params.buildSourceBranch == 'master') {
         gulp.series(bumpVersion, publishExtension, gitAddCommit)(done());
     }
-    else { done('Failed to Upload Extension'); }
+    else { 
+        console.log('Branch: ' + params.buildSourceBranch);
+        done(null, 'Failed to Upload Extension'); }
 }
 function writeFilenameToFile() {
     let output = fs.createWriteStream(__dirname + '/test/app.spec.ts');
@@ -191,7 +193,7 @@ exports.package = gulp.series(tfxInstall, packageExtension);
 exports.packageextension = packageExtension;
 exports.pretest = gulp.series(cleanCoverage, setupCoveragePool);
 exports.printversion = printVersion;
-exports.publish = gulp.series(tfxInstall, publishExtension);
+exports.publish = publishExtension;
 exports.setupcoveragepool = setupCoveragePool;
 exports.testnycmocha = testNycMocha;
 exports.tfxinstall = tfxInstall;
