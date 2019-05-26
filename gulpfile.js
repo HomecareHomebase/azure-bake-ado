@@ -21,7 +21,7 @@ function cleanCoverage() {
 }
 
 function gitAddCommit(done) {
-    return shell.task(['git add --a', 'git commit -a -m "[CHORE] Update & Publish"'])(done());
+    return shell.task(['sudo git add --a && sudo git commit -a -m "[CHORE] Update & Publish"'])(done());
 }
 
 function inlineCoverageSource() {
