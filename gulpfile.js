@@ -1,116 +1,111 @@
-const exec = require('child_process').exec;
-const git = require('gulp-git');
+var exec = require('child_process').exec;
 const gulp = require('gulp');
-const merge = require('merge-stream');
 const shell = require('gulp-shell');
+const vstsBump = require('gulp-vsts-bump');
+const fs = require('file-system');
 const es = require('event-stream');
+const debug = require('gulp-debug');
 const del = require('del');
-const fs = require('fs');
-const inlinesource = require('gulp-inline-source');
-const argv = require('yargs').argv;
 const moment = require('moment');
-const sonarqubeScanner = require('sonarqube-scanner');
+const inlinesource = require('gulp-inline-source');
+const params = require('./build/parameters');
+const spawn = require('child_process').spawn;
 
-var IsRunningOnVsts = !!process.env.AGENT_ID;
-
+console.log('Is It a Local Build? ' + params.isRunningOnADO);
 function bumpVersion() {
-	return es.map((file, cb) => {
-		let taskJsonPath = file.history[0];
-		if (taskJsonPath) {
-			console.log("Bumping version for task: " + taskJsonPath);
-			var taskJson = JSON.parse(fs.readFileSync(taskJsonPath));
-			if (typeof taskJson.version.Patch != 'number') {
-				fail(`Error processing '${name}'. version.Patch should be a number.`);
-			}
-
-			taskJson.version.Patch = taskJson.version.Patch + 1;
-			fs.writeFileSync(taskJsonPath, JSON.stringify(taskJson, null, 4));
-		}
-		cb(null, file);
-	});
+    return gulp.src(['tasks/**/task.json'], { base: './' })
+        .pipe(vstsBump({ type: 'patch' }))
+        .pipe(gulp.dest('./'));
 }
 
-gulp.task('bump-version', function () {
-	return gulp.src(['tasks/**/task.json'])
-		.pipe(bumpVersion())
-});
-
-gulp.task('clean-coverage', () => {
-	return del('coverage/**', { force: true });
-});
-
-// write a list of filenames to a text file
-// this sets up a file that includes all of the ts files, to ensure code coverage numbers include everything
-function writeFilenameToFile() {
-	let output = fs.createWriteStream(__dirname + '/test/app.spec.ts');
-	output.write('// I am an automatically generated file. I help ensure that unit tests have accurate code coverage numbers. You can ignore me.\n\n')
-
-	return es.map((file, cb) => {
-		let name = file.history[0];
-		if (name) {
-			name = name.replace(__dirname + '.').replace(/\\/g, '/');
-			output.write('require(\'' + name + '\');\n');
-		}
-
-		cb(null, file);
-	});
+function cleanCoverage() {
+    return del('coverage/**', { force: true });
 }
-gulp.task('setup-coverage-pool', function () {
-	return gulp.src(['tasks/**/*.ts', '!tasks/**/tests.ts', '!tasks/**/node_modules/**/*'])
-		.pipe(writeFilenameToFile())
-});
 
-gulp.task('test-nyc-mocha', shell.task(['nyc mocha --opts test/mocha.opts']));
+function gitAddCommit(done) {
+    return shell.task(['git add --a', 'git commit -a -m "[CHORE] Update & Publish"'])(done());
+}
 
-// print a command for VSTS to pick up the build number
-gulp.task('print-version', function () {
-	let name = require('./package.json').version;
+function inlineCoverageSource() {
+    return gulp.src('./coverage/*.html')
+        .pipe(inlinesource({ attribute: false }))
+        .pipe(gulp.dest('./coverage/inline-html'));
+}
 
-	if (process.env.BUILD_REASON === 'PullRequest') {
-		// pull requests will be [version]_[source branch name]
-		const branchName = process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH;
-		name += '_' + branchName.replace(/refs\/heads\/(feature\/)?/i, '');
-	} else if (process.env.BUILD_SOURCEBRANCHNAME) {
-		const branchName = process.env.BUILD_SOURCEBRANCH;
+function printVersion(done) {
+    let name = require('./package.json').version;
 
-		if (branchName !== 'master') {
-			// all branches have refs/heads/ - we don't need that
-			// we will also remove feature/ if it's there
-			name += '_' + branchName.replace(/refs\/heads\/(feature\/)?/i, '');
-		}
-	}
+    if (process.env.BUILD_REASON === 'PullRequest') {
+        // pull requests will be [version]_[source branch name]
+        const branchName = process.env.SYSTEM_PULLREQUEST_SOURCEBRANCH;
+        name += '_' + branchName.replace(/refs\/heads\/(feature\/)?/i, '');
+    } else if (process.env.BUILD_SOURCEBRANCHNAME) {
+        const branchName = process.env.BUILD_SOURCEBRANCH;
 
-	// make sure no illegal characters are there
-	name = name.replace(/\"|\/|:|<|>|\\|\|\?|\@|\*/g, '_');
+        if (branchName !== 'master') {
+            // all branches have refs/heads/ - we don't need that
+            // we will also remove feature/ if it's there
+            name += '_' + branchName.replace(/refs\/heads\/(feature\/)?/i, '');
+        }
+    }
 
-	// add YYYYMMDD_HHmm to mark the date and time of this build
-	name += `_${moment().format('YYYYMMDD.HHmm')}`;
+    // make sure no illegal characters are there
+    name = name.replace(/\"|\/|:|<|>|\\|\|\?|\@|\*/g, '_');
 
-	console.log('##vso[build.updatebuildnumber]' + name);
-});
+    // add YYYYMMDD_HHmm to mark the date and time of this build
+    name += `_${moment().format('YYYYMMDD.HHmm')}`;
 
-gulp.task('inline-coverage-source', function () {
-	return gulp.src('./coverage/*.html')
-		.pipe(inlinesource({ attribute: false }))
-		.pipe(gulp.dest('./coverage/inline-html'));
-});
+    console.log('##vso[build.updatebuildnumber]' + name);
+    done();
+}
 
-gulp.task('tfx-install', shell.task(['npm remove tfx-cli && npm install --global tfx-cli']));
+function packageExtension(done) {
+    var child = exec('tfx extension create --root . --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version');
+    child.stdout.on('data', function (data) {
+        console.log('stdout: ' + data);
+    });
+    child.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+    });
+    child.on('error', function (errors) {
+        console.log('Comand Errors: ' + errors);
+        error(errors);
+    });
+    child.on('close', function (code) {
+        console.log('closing code: ' + code);
+        done(null, code);
+    });
+}
 
-gulp.task('package', gulp.series('tfx-install', shell.task(['tfx extension create --root . --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version'])));
+function publishExtension(done) {
+    var child = exec('tfx extension publish --root . --share-with ' + process.env.ORGSHARE +' --token ' + process.env.VSMARKETPLACETOKEN + ' --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version');
+    child.stdout.on('data', function (data) {
+        console.log('stdout: ' + data);
+    });
+    child.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+    });
+    child.on('error', function (errors) {
+        console.log('Comand Errors: ' + errors);
+        error(errors);
+    });
+    child.on('close', function (code) {
+        console.log('closing code: ' + code);
+        done(null, code);
+    });
+}
 
-gulp.task('publish', gulp.series('tfx-install', shell.task(['tfx extension publish --root . --share-with ' + process.env.ORGSHARE +' --token ' + process.env.VSMARKETPLACETOKEN + ' --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version'])));
+function setupCoveragePool() {
+    return gulp.src("tasks/**/*.ts").pipe(writeFilenameToFile()).pipe(debug());
+}
 
-//this task is meant to only run from VSTS builds, not local builds
-gulp.task('analysis', done => {
-	if (!IsRunningOnVsts) {
+function sonarQube(done) {
+	if (!parms.isRunningOnADO) {
 		console.log('Skipping SonarQube analysis for local build...');
 		done();
 	}
 	else {
-
 		let version = require('./package.json').version;
-
 		//standard SonarQube configuration options
 		let sonarOptions = {
 			"sonar.projectName": "Azure-Bake-ADO",
@@ -139,25 +134,65 @@ gulp.task('analysis', done => {
 			serverUrl: "https://sonarqube.hchb.com",
 			token: argv.sonarToken,
 			options: sonarOptions
-		}, callback);
+		}, done);
 	}
-});
+}
 
-gulp.task('git-add-commit', function (done) { 
-	var add = exec('git add --a');
-	var commit = exec('git commit -a -m "[CHORE] Update & Publish"');
-	done();
-});
+function testNycMocha(done) {
+    return shell.task(['nyc mocha --opts test/mocha.opts'])(done());
+}
 
-gulp.task('pretest', gulp.series('clean-coverage', 'setup-coverage-pool'));
+function tfxInstall(done) {
+    var child = exec("npm remove tfx-cli && npm install --global tfx-cli");
+    child.stdout.on('data', function (data) {
+        console.log('stdout: ' + data);
+    });
+    child.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+    });
+    child.on('error', function (errors) {
+        console.log('Comand Errors: ' + errors);
+        error(errors);
+    });
+    child.on('close', function (code) {
+        console.log('closing code: ' + code);
+        done(null, code);
+    });
+}
 
-gulp.task('test-coverage', gulp.series('clean-coverage', 'setup-coverage-pool', 'test-nyc-mocha'));
+function uploadExtension (done) {
+    if (true) {
+        gulp.series(bumpVersion, publishExtension, gitAddCommit)(done());
+    }
+    else { done('Failed to Upload Extension'); }
+}
+function writeFilenameToFile() {
+    let output = fs.createWriteStream(__dirname + '/test/app.spec.ts');
+    output.write('// I am an automatically generated file. I help ensure that unit tests have accurate code coverage numbers. You can ignore me.\n\n')
+    //Return event-stream map to the pipeline
+    return es.map((file, cb) => {
+        let name = file.history[0];
+        if (name) {
+            name = name.replace(__dirname + '.').replace(/\\/g, '/');
+            output.write('require(\'' + name + '\');\n');
+        }
+        //Callback signals the operation is done and returns the object to the pipeline
+        cb(null, file);
+    });
+}
 
-gulp.task('test-coverage-sonarqube', gulp.series('clean-coverage', 'setup-coverage-pool', 'test-nyc-mocha', 'analysis'));
-
-gulp.task('upload-extension', function (done) { 
-	if (IsRunningOnVsts && process.env.BUILD_REASON != 'PullRequest') {
-		gulp.series('bump-version', 'publish', 'git-add-commit');
-	}
-	done();
-});
+exports.coverage = gulp.series(cleanCoverage, setupCoveragePool, testNycMocha);
+exports.pretest = gulp.series(cleanCoverage, setupCoveragePool);
+exports.analysis = gulp.series(sonarQube);
+exports.package = gulp.series(tfxInstall, packageExtension);
+exports.publish = gulp.series(tfxInstall, publishExtension);
+exports.bump = bumpVersion;
+exports.commit = gitAddCommit;
+exports.cleancoverage = cleanCoverage;
+exports.setupcoveragepool = setupCoveragePool;
+exports.inlinecoveragesource = inlineCoverageSource;
+exports.packageextension = packageExtension;
+exports.printversion = printVersion;
+exports.testnycmocha = testNycMocha;
+exports.tfxinstall = tfxInstall;
+exports.upload = uploadExtension;
