@@ -15,7 +15,6 @@ pr:
 pool:
   vmImage: 'ubuntu-16.04'
 steps:
-steps:
 - checkout: self
   persistCredentials: true
 - powershell: 'Get-ChildItem Env:'
