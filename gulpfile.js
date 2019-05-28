@@ -8,6 +8,7 @@ const inlinesource = require('gulp-inline-source');
 const moment = require('moment');
 const params = require('./build/parameters');
 const shell = require('gulp-shell');
+const tag = require('gulp-tag-version');
 const vstsBump = require('gulp-vsts-bump');
 
 function bumpVersion() {
@@ -27,10 +28,11 @@ function gitAddCommit(done) {
         // we will also remove feature/ if it's there
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
-    const gitArr = params.buildRepositoryURI.split('https://');
-    const gitString = gitArr[0] + '//vsts:' + params.gitToken + gitArr[1];
+    return shell.task(['sudo git checkout ' + branchName + ' && sudo git add --a && sudo git commit -q -a -m "[skip-ci][CHORE] Update & Publish" && sudo git push origin'])(done());
+}
 
-    return shell.task(['sudo git checkout ' + branchName + ' && sudo git add --a && sudo git commit -q -a -m "[CHORE] Update & Publish" && sudo git push origin'])(done());
+function tagVersion() {
+    return gulp.src('./vss-extension.json').pipe(tag());
 }
 
 function inlineCoverageSource() {
@@ -67,7 +69,7 @@ function printVersion(done) {
 }
 
 function packageExtension(done) {
-    var child = exec('sudo tfx extension create --root . --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version');
+    var child = exec('sudo tfx extension create --root . --output-path ' + params.vsixDirectory + ' --manifest-globs vss-extension.json --rev-version');
     child.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
     });
@@ -85,7 +87,7 @@ function packageExtension(done) {
 }
 
 function publishExtension(done) {
-    var child = exec('sudo tfx extension publish --root . --share-with ' + process.env.ORGSHARE +' --token ' + process.env.VSMARKETPLACETOKEN + ' --output-path ' + process.env.EXTENSIONDIRECTORY + ' --manifest-globs vss-extension.json --rev-version');
+    var child = exec('sudo tfx extension publish --root . --share-with ' + process.env.ORGSHARE +' --token ' + process.env.VSMARKETPLACETOKEN + ' --output-path ' + params.vsixDirectory + ' --manifest-globs vss-extension.json --rev-version');
     child.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
     });
@@ -203,6 +205,7 @@ exports.packageextension = packageExtension;
 exports.pretest = gulp.series(cleanCoverage, setupCoveragePool);
 exports.printversion = printVersion;
 exports.setupcoveragepool = setupCoveragePool;
+exports.tag = tagVersion;
 exports.publish = gulp.series(tfxInstall, uploadExtension);
 exports.testnycmocha = testNycMocha;
 exports.tfxinstall = tfxInstall;
