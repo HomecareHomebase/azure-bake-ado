@@ -1,6 +1,7 @@
 const exec = require('child_process').exec;
 const del = require('del');
 const es = require('event-stream');
+const filter = require('gulp-filter');
 const fs = require('file-system');
 const gulp = require('gulp');
 const debug = require('gulp-debug');
@@ -28,11 +29,16 @@ function gitAddCommit(done) {
         // we will also remove feature/ if it's there
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
-    return shell.task(['sudo git checkout ' + branchName + ' && sudo git add --a && sudo git commit -q -a -m "[skip ci][CHORE] Update & Publish" && sudo git push origin'])(done());
+    return shell.task([`sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
+                        sudo git config --global user.name "` + params.buildRequestedFor + `"
+                        sudo git checkout ` + branchName + ` && 
+                        sudo git add --a && 
+                        sudo git commit -q -a -m "[skip ci][CHORE] Update & Publish" && 
+                        sudo git push origin`])(done());
 }
 
 function tagVersion() {
-    return gulp.src('./vss-extension.json').pipe(tag());
+    return gulp.src('./vss-extension.json').pipe(filter('vss-extension.json')).pipe(tag());
 }
 
 function inlineCoverageSource() {
@@ -177,6 +183,7 @@ function uploadExtension (done) {
         console.log('Branch: ' + params.buildSourceBranch);
         done(null, 'Failed to Upload Extension'); }
 }
+
 function writeFilenameToFile() {
     let output = fs.createWriteStream(__dirname + '/test/app.spec.ts');
     output.write('// I am an automatically generated file. I help ensure that unit tests have accurate code coverage numbers. You can ignore me.\n\n')

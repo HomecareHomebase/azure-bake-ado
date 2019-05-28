@@ -1,4 +1,6 @@
 exports.artifactsDirectory = process.env.BUILD_ARTIFACTSTAGINGDIRECTORY || "./artifacts";
+exports.buildRequestedFor = process.env.BUILD_REQUESTEDFOR || 'Pipeline Dream'
+exports.buildRequestedForEmail = process.env.BUILD_REQUESTEDFOREMAIL || 'HCHB-Pipeline-Dream@hchb.com'
 exports.buildRepositoryURI = process.env.BUILD_REPOSITORY_URI;
 exports.buildSourceBranch = process.env.BUILD_SOURCEBRANCHNAME;
 exports.gitToken = process.env.VSMARKETPLACETOKEN;
