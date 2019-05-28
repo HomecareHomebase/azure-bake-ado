@@ -17,35 +17,33 @@ variables:
   - group: GitHub Token
   - group: VS Marketplace Token
 
-jobs:
 
-  - job: Build
-    steps:
-      - checkout: self
-        persistCredentials: true
-        clean: true
-      - powershell: 'Get-ChildItem Env:'
-        displayName: 'Get-ChildItem Env:'
-      - task: PowerShell@2
-        displayName: NPM Build
-        inputs: null
-        targetType: inline
-        script: 'npm run prod:full'
-    env:
-      GITHUBTOKEN: $(GitHubToken)
-      VSMARKETPLACETOKEN: $(VsMarketplaceToken)
+steps:
+- checkout: self
+  persistCredentials: true
+  clean: true
 
-  - job: Release
-    dependsOn: Build
-    condition: 'and(succeeded(), eq(variables[''Release''], ''true''))'
-    steps:
-      - task: GitHubRelease@0
-        inputs:
-          gitHubConnection: null
-          repositoryName: $(Build.Repository.Name)
-          action: create
-          target: $(Build.SourceVersion)
-          tagSource: auto
-          title: Azure Bake ADO Tools Extension
-          assets: $(Build.ArtifactStagingDirectory)/*
-          assetUploadMode: delete
+- powershell: 'Get-ChildItem Env:'
+  displayName: 'Get-ChildItem Env:'
+
+- task: PowerShell@2
+  displayName: NPM Build
+  inputs: null
+  targetType: inline
+  script: 'npm run prod:full'
+  env:
+    GITHUBTOKEN: $(GitHubToken)
+    VSMARKETPLACETOKEN: $(VsMarketplaceToken)
+
+- task: GitHubRelease@0
+  inputs:
+    gitHubConnection: null
+    repositoryName: $(Build.Repository.Name)
+    action: create
+    target: $(Build.SourceVersion)
+    tagSource: auto
+    title: Azure Bake ADO Tools Extension
+    assets: $(Build.ArtifactStagingDirectory)/*
+    assetUploadMode: delete
+    release: false
+    isDraft: $(DraftRelease)
