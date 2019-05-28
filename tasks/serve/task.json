@@ -61,15 +61,15 @@
     {
       "name": "useKubernetes",
       "type": "boolean",
-      "label": "Deployment Regions",
+      "label": "Deploy to a Kubernetes Cluster",
       "required": true,
       "helpMarkDown": "Bundle the kubernetes config (must run k8 task login first) into the deployment",
       "groupName": "env"
     },
     {
-      "name": "configToken",
+      "name": "kubeConfigToken",
       "type": "string",
-      "label": "Deployment Regions",
+      "label": "Token Name",
       "required": false,
       "helpMarkDown": "name of the BAKE varibale to store the kube config content",
       "groupName": "env",
