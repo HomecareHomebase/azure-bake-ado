@@ -1,3 +1,5 @@
+exports.buildRepositoryURI = process.env.BUILD_REPOSITORY_URI;
+exports.gitToken = process.env.VSMARKETPLACETOKEN;
 exports.isRunningOnADO = !!process.env.AGENT_ID;
 exports.isLocalBuild = !process.env.AGENT_ID;
 exports.isPullRequest = !!process.env.SYSTEM_PULLREQUESTID;

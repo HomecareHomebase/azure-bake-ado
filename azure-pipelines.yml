@@ -17,6 +17,7 @@ pool:
 steps:
 - checkout: self
   persistCredentials: true
+  clean: true
 - powershell: 'Get-ChildItem Env:'
   displayName: 'Get-ChildItem Env:'
 - task: PowerShell@2

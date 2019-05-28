@@ -21,7 +21,19 @@ function cleanCoverage() {
 }
 
 function gitAddCommit(done) {
-    return shell.task(['sudo git add --a && sudo git commit -a -m "[CHORE] Update & Publish" && sudo git push origin master'])(done());
+    const branchName = process.env.BUILD_SOURCEBRANCH;
+    if (branchName !== 'master') {
+        // all branches have refs/heads/ - we don't need that
+        // we will also remove feature/ if it's there
+        name += '_' + branchName.replace(/refs\/heads\/(feature\/)?/i, '');
+    }
+    const gitArr = params.buildRepositoryURI.split('https://');
+    const gitString = string.join(gitArr[0], '//vsts:' + params.gitToken, gitArr[1]);
+
+    return shell.task(['sudo git checkout ' + branchName + ' && ' +
+                        'sudo git add --a && ' +
+                        'sudo git commit -q -a -m "[CHORE] Update & Publish" && ' +
+                        'sudo git -q push origin'])(done());
 }
 
 function inlineCoverageSource() {
@@ -193,9 +205,8 @@ exports.package = gulp.series(tfxInstall, packageExtension);
 exports.packageextension = packageExtension;
 exports.pretest = gulp.series(cleanCoverage, setupCoveragePool);
 exports.printversion = printVersion;
-exports.publish = publishExtension;
 exports.setupcoveragepool = setupCoveragePool;
-exports.publish = gulp.series(tfxInstall, uploadExtension)
+exports.publish = gulp.series(tfxInstall, uploadExtension);
 exports.testnycmocha = testNycMocha;
 exports.tfxinstall = tfxInstall;
 exports.upload = uploadExtension;
