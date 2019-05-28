@@ -21,7 +21,7 @@ function cleanCoverage() {
 }
 
 function gitAddCommit(done) {
-    const branchName = process.env.BUILD_SOURCEBRANCH;
+    var branchName = process.env.BUILD_SOURCEBRANCH;
     if (branchName !== 'master') {
         // all branches have refs/heads/ - we don't need that
         // we will also remove feature/ if it's there
