@@ -28,7 +28,7 @@ function gitAddCommit(done) {
         // we will also remove feature/ if it's there
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
-    return shell.task(['sudo git checkout ' + branchName + ' && sudo git add --a && sudo git commit -q -a -m "[skip-ci][CHORE] Update & Publish" && sudo git push origin'])(done());
+    return shell.task(['sudo git checkout ' + branchName + ' && sudo git add --a && sudo git commit -q -a -m "[skip ci][CHORE] Update & Publish" && sudo git push origin'])(done());
 }
 
 function tagVersion() {
