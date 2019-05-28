@@ -30,7 +30,6 @@ jobs:
     env:
       GITHUBTOKEN: $(GitHubToken)
       VSMARKETPLACETOKEN: $(VsMarketplaceToken)
-jobs:
 - job: Release
   dependsOn: Build
   condition: and(succeeded(), eq(variables['Release'], 'true'))
