@@ -28,7 +28,7 @@ function gitAddCommit(done) {
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
     const gitArr = params.buildRepositoryURI.split('https://');
-    const gitString = String.join(gitArr[0], '//vsts:' + params.gitToken, gitArr[1]);
+    const gitString = gitArr[0] + '//vsts:' + params.gitToken + gitArr[1];
 
     return shell.task(['sudo git checkout ' + branchName + ' && sudo git add --a && sudo git commit -q -a -m "[CHORE] Update & Publish" && sudo git -q push origin'])(done());
 }
