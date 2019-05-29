@@ -23,7 +23,22 @@ function cleanCoverage() {
     return del('coverage/**', { force: true });
 }
 
-function gitAddCommit(done) {
+function gitCommit(done) {
+    var branchName = params.buildSourceBranch;
+    if (branchName !== 'master') {
+        // all branches have refs/heads/ - we don't need that
+        // we will also remove feature/ if it's there
+        branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
+    }
+    
+    var gitScript = `sudo git add . && 
+    sudo git commit --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
+    sudo git push origin ` + branchName;
+    console.log('Git Script: ' + gitScript);
+    return shell.task(gitScript)(done());
+}
+
+function gitCheckout(done) {
     var branchName = params.buildSourceBranch;
     if (branchName !== 'master') {
         // all branches have refs/heads/ - we don't need that
@@ -33,11 +48,8 @@ function gitAddCommit(done) {
     
     var gitScript = `sudo git checkout ` + branchName + ` && 
     sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
-    sudo git config --global user.name "` + params.buildRequestedFor + `"    
-    sudo git add . && 
-    sudo git commit --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
-    sudo git push origin ` + branchName;
-    console.log('Git Script: ' + gitScript);
+    sudo git config --global user.name "` + params.buildRequestedFor;
+    console.log('Checkout Script: ' + gitScript);
     return shell.task(gitScript)(done());
 }
 function tagVersion() {
@@ -180,7 +192,7 @@ function tfxInstall(done) {
 
 function uploadExtension (done) {
     if (!params.isPullRequest && params.buildSourceBranch == 'master') {
-        gulp.series(tfxInstall, bumpVersion, publishExtension, gitAddCommit, )(done());
+        gulp.series(tfxInstall, bumpVersion, publishExtension, gitCheckout, tagVersion, gitCommit)(done());
     }
     else { 
         console.log('Branch: ' + params.buildSourceBranch);
@@ -211,7 +223,8 @@ function recipeDiff() {
 //Tasks
 exports.analysis = gulp.series(sonarQube);
 exports.bump = bumpVersion;
-exports.commit = gitAddCommit;
+exports.commit = gitCommit;
+exports.checkout = gitCheckout;
 exports.cleancoverage = cleanCoverage;
 exports.coverage = gulp.series(cleanCoverage, setupCoveragePool, testNycMocha);
 exports.coveragesonarqube = gulp.series(cleanCoverage, setupCoveragePool, testNycMocha, sonarQube);
