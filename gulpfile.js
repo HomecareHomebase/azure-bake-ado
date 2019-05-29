@@ -37,8 +37,8 @@ function gitCommit(done) {
     sudo git config user.name "` + params.buildRequestedFor + `" &&
     sudo git add . && 
     sudo git commit --author '` + params.buildRequestedFor + ` <` + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
-    git tag -a v` + vss.version + ` -m 'Azure Bake Tools Extension Version v` + vss.version + `' --local-user '` + params.buildRequestedFor + ` <` + params.buildRequestedForEmail + `>' &&`
-    `sudo git push origin v` + vss.version;
+    sudo git tag v` + vss.version + ` &&
+    sudo git push origin --tags`;
     console.log('Git Script: ' + gitScript);
     return shell.task(gitScript)(done());
 }
