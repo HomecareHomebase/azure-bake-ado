@@ -31,27 +31,16 @@ function gitCommit(done) {
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
     
-    var gitScript = `sudo git add . && 
+    var gitScript = `sudo git checkout ` + branchName + ` && 
+    sudo git config user.email "` + params.buildRequestedForEmail + `" &&
+    sudo git config user.name "` + params.buildRequestedFor + ` &&
+    sudo git add . && 
     sudo git commit --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
     sudo git push origin ` + branchName;
     console.log('Git Script: ' + gitScript);
     return shell.task(gitScript)(done());
 }
 
-function gitCheckout(done) {
-    var branchName = params.buildSourceBranch;
-    if (branchName !== 'master') {
-        // all branches have refs/heads/ - we don't need that
-        // we will also remove feature/ if it's there
-        branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
-    }
-    
-    var gitScript = `sudo git checkout ` + branchName + ` && 
-    sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
-    sudo git config --global user.name "` + params.buildRequestedFor;
-    console.log('Checkout Script: ' + gitScript);
-    return shell.task(gitScript)(done());
-}
 function tagVersion() {
     return gulp.src('./vss-extension.json').pipe(tag());
 }
@@ -192,7 +181,7 @@ function tfxInstall(done) {
 
 function uploadExtension (done) {
     if (!params.isPullRequest && params.buildSourceBranch == 'master') {
-        gulp.series(tfxInstall, bumpVersion, publishExtension, gitCheckout, gitCommit, tagVersion)(done());
+        gulp.series(tfxInstall, bumpVersion, publishExtension, gitCommit, tagVersion)(done());
     }
     else { 
         console.log('Branch: ' + params.buildSourceBranch);
