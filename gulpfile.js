@@ -31,12 +31,12 @@ function gitAddCommit(done) {
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
     
-    var gitScript = `sudo -i && git checkout ` + branchName + ` && 
-    git config --global user.email "` + params.buildRequestedForEmail + `" &&
-    git config --global user.name "` + params.buildRequestedFor + `"    
-    git add . && 
-    git commit --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
-    git push origin ` + branchName;
+    var gitScript = `sudo git checkout ` + branchName + ` && 
+    sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
+    sudo git config --global user.name "` + params.buildRequestedFor + `"    
+    sudo git add . && 
+    sudo git commit --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
+    sudo git push origin ` + branchName;
     console.log('Git Script: ' + gitScript);
     return shell.task(gitScript)(done());
 }
