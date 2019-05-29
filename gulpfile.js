@@ -41,7 +41,8 @@ function gitAddCommit(done) {
     return shell.task(gitScript)(done());
 }
 function tagVersion() {
-    return gulp.src('./vss-extension.json').pipe(filter('vss-extension.json')).pipe(tag());
+    bumpVersion();
+    return gulp.src('./vss-extension.json').pipe(tag());
 }
 
 function inlineCoverageSource() {
@@ -96,7 +97,7 @@ function packageExtension(done) {
 }
 
 function publishExtension(done) {
-    var child = exec('sudo tfx extension publish --root . --share-with ' + process.env.ORGSHARE +' --token ' + process.env.VSMARKETPLACETOKEN + ' --output-path ' + params.vsixDirectory + ' --manifest-globs vss-extension.json --rev-version');
+    var child = exec('sudo tfx extension publish --root . --share-with ' + params.orgShare +' --token ' + process.env.VSMARKETPLACETOKEN + ' --output-path ' + params.vsixDirectory + ' --manifest-globs vss-extension.json --rev-version');
     child.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
     });
@@ -180,7 +181,7 @@ function tfxInstall(done) {
 
 function uploadExtension (done) {
     if (!params.isPullRequest && params.buildSourceBranch == 'master') {
-        gulp.series(tfxInstall, bumpVersion, publishExtension, gitAddCommit, tagVersion)(done());
+        gulp.series(tfxInstall, bumpVersion, publishExtension, gitAddCommit, )(done());
     }
     else { 
         console.log('Branch: ' + params.buildSourceBranch);
