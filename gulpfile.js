@@ -38,16 +38,15 @@ function gitAddCommit(done) {
             .pipe(git.push())
             .pipe(debug());*/
 
-    var gitScript = `sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
-    sudo git config --global user.name "` + params.buildRequestedFor + `"
-    sudo git checkout ` + branchName + ` && 
+    var gitScript = `sudo git checkout ` + branchName + ` && 
+    sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
+    sudo git config --global user.name "` + params.buildRequestedFor + `"    
     sudo git add --a && 
-    sudo git commit -a -m "[skip ci][CHORE] Update & Publish" && 
-    sudo git push origin`;
+    sudo git commit --author '` + params.buildRequestedFor + '<' + params.buildRequestedForEmail + `>' -m "[skip ci][CHORE] Update & Publish" && 
+    sudo git push origin ` + branchName ` -q`;
     console.log('Git Script: ' + gitScript);
     return shell.task(gitScript)(done());
 }
-
 function tagVersion() {
     return gulp.src('./vss-extension.json').pipe(filter('vss-extension.json')).pipe(tag());
 }
