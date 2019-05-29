@@ -39,7 +39,6 @@ function gitCommit(done) {
     sudo git commit --author '` + params.buildRequestedFor + ` <` + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
     sudo git tag v` + vss.version + ` &&
     sudo git push origin --tags`;
-    
     console.log('Git Script: ' + gitScript);
     return shell.task(gitScript)(done());
 }
