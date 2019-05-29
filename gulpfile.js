@@ -213,7 +213,6 @@ function recipeDiff() {
 exports.analysis = gulp.series(sonarQube);
 exports.bump = bumpVersion;
 exports.commit = gitCommit;
-exports.checkout = gitCheckout;
 exports.cleancoverage = cleanCoverage;
 exports.coverage = gulp.series(cleanCoverage, setupCoveragePool, testNycMocha);
 exports.coveragesonarqube = gulp.series(cleanCoverage, setupCoveragePool, testNycMocha, sonarQube);
