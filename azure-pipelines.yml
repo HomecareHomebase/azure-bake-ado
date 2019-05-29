@@ -1,35 +1,30 @@
-pool:
-  vmImage: ubuntu-16.04
-
+variables:
+- group: GitHub Token
+- group: VS Marketplace Token
 trigger:
   branches:
     include:
-      - master
-      - release/v*
-      - refs/tags/v*
+    - master
+    - release/v*
+    - refs/tags/v*
 pr:
   branches:
     include:
-      - master
-      - release/v*
-
-variables:
-  - group: GitHub Token
-  - group: VS Marketplace Token
-
-
+    - master
+    - release/v*
+pool:
+  vmImage: 'ubuntu-16.04'
 steps:
 - checkout: self
   persistCredentials: true
   clean: true
-
 - powershell: 'Get-ChildItem Env:'
   displayName: 'Get-ChildItem Env:'
-
 - task: PowerShell@2
-displayName: NPM Build  
-targetType: inline
-script: 'npm run prod:full'
-env:
-  GITHUBTOKEN: $(GitHubToken)
-  VSMARKETPLACETOKEN: $(VsMarketplaceToken)
+  displayName: 'NPM Build'
+  inputs:
+    targetType: 'inline'
+    script: 'npm run prod:full'
+  env:
+    GITHUBTOKEN: $(GitHubToken)
+    VSMARKETPLACETOKEN: $(VsMarketplaceToken)
