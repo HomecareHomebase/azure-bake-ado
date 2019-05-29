@@ -31,7 +31,7 @@ function gitAddCommit(done) {
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
     
-    var gitScript = `git checkout ` + branchName + ` && 
+    var gitScript = `sudo -i && git checkout ` + branchName + ` && 
     git config --global user.email "` + params.buildRequestedForEmail + `" &&
     git config --global user.name "` + params.buildRequestedFor + `"    
     git add . && 
