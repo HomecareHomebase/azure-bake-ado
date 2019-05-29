@@ -27,9 +27,9 @@ steps:
   displayName: 'Get-ChildItem Env:'
 
 - task: PowerShell@2
-  displayName: NPM Build  
-  targetType: inline
-  script: 'npm run prod:full'
-  env:
-    GITHUBTOKEN: $(GitHubToken)
-    VSMARKETPLACETOKEN: $(VsMarketplaceToken)
+displayName: NPM Build  
+targetType: inline
+script: 'npm run prod:full'
+env:
+  GITHUBTOKEN: $(GitHubToken)
+  VSMARKETPLACETOKEN: $(VsMarketplaceToken)
