@@ -3,6 +3,7 @@ const del = require('del');
 const es = require('event-stream');
 const filter = require('gulp-filter');
 const fs = require('file-system');
+const git = require('gulp-git');
 const gulp = require('gulp');
 const debug = require('gulp-debug');
 const inlinesource = require('gulp-inline-source');
@@ -23,25 +24,28 @@ function cleanCoverage() {
 }
 
 function gitAddCommit(done) {
-    var branchName = process.env.BUILD_SOURCEBRANCH;
+    var branchName = params.buildSourceBranch;
     if (branchName !== 'master') {
         // all branches have refs/heads/ - we don't need that
         // we will also remove feature/ if it's there
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
+    /*git.checkout(branchName);
+    return gulp.src('components/*')
+            .pipe(git.diff(params.pullRequestTargetBranch, { args: "--no-commit-id --name-only", log: true }))
+            .pipe(git.add())
+            .pipe(git.commit())
+            .pipe(git.push())
+            .pipe(debug());*/
+
     var gitScript = `sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
     sudo git config --global user.name "` + params.buildRequestedFor + `"
     sudo git checkout ` + branchName + ` && 
     sudo git add --a && 
-    sudo git commit -q -a -m "[skip ci][CHORE] Update & Publish" && 
+    sudo git commit -a -m "[skip ci][CHORE] Update & Publish" && 
     sudo git push origin`;
     console.log('Git Script: ' + gitScript);
-    return shell.task([`sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
-                        sudo git config --global user.name "` + params.buildRequestedFor + `"
-                        sudo git checkout ` + branchName + ` && 
-                        sudo git add --a && 
-                        sudo git commit -q -a -m "[skip ci][CHORE] Update & Publish" && 
-                        sudo git push origin`])(done());
+    return shell.task(gitScript)(done());
 }
 
 function tagVersion() {
@@ -204,6 +208,12 @@ function writeFilenameToFile() {
         //Callback signals the operation is done and returns the object to the pipeline
         cb(null, file);
     });
+}
+
+function recipeDiff() {
+	return gulp.src('components/**/*')
+		.pipe(git.diff(params.pullRequestTargetBranch, { args: "--no-commit-id --name-only", log: true }))
+		.pipe(gulp.dest(params.artifactsDirectory + '/recipes'));
 }
 
 //Tasks
