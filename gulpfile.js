@@ -36,7 +36,7 @@ function gitCommit(done) {
     sudo git config user.email "` + params.buildRequestedForEmail + `" &&
     sudo git config user.name "` + params.buildRequestedFor + `" &&
     sudo git add . && 
-    sudo git commit --tag '` + vss.version + `' --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
+    sudo git commit --tag 'v` + vss.version + `' --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
     sudo git push origin ` + branchName;
     console.log('Git Script: ' + gitScript);
     return shell.task(gitScript)(done());
