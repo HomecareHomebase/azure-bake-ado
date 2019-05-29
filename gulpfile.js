@@ -29,6 +29,13 @@ function gitAddCommit(done) {
         // we will also remove feature/ if it's there
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
+    var gitScript = `sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
+    sudo git config --global user.name "` + params.buildRequestedFor + `"
+    sudo git checkout ` + branchName + ` && 
+    sudo git add --a && 
+    sudo git commit -q -a -m "[skip ci][CHORE] Update & Publish" && 
+    sudo git push origin`;
+    console.log('Git Script: ' + gitScript);
     return shell.task([`sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
                         sudo git config --global user.name "` + params.buildRequestedFor + `"
                         sudo git checkout ` + branchName + ` && 
