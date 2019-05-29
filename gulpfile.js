@@ -30,14 +30,7 @@ function gitAddCommit(done) {
         // we will also remove feature/ if it's there
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
-    /*git.checkout(branchName);
-    return gulp.src('components/*')
-            .pipe(git.diff(params.pullRequestTargetBranch, { args: "--no-commit-id --name-only", log: true }))
-            .pipe(git.add())
-            .pipe(git.commit())
-            .pipe(git.push())
-            .pipe(debug());*/
-
+    
     var gitScript = `sudo git checkout ` + branchName + ` && 
     sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
     sudo git config --global user.name "` + params.buildRequestedFor + `"    
@@ -187,7 +180,7 @@ function tfxInstall(done) {
 
 function uploadExtension (done) {
     if (!params.isPullRequest && params.buildSourceBranch == 'master') {
-        gulp.series(bumpVersion, publishExtension, gitAddCommit)(done());
+        gulp.series(tfxInstall, bumpVersion, publishExtension, gitAddCommit, tagVersion)(done());
     }
     else { 
         console.log('Branch: ' + params.buildSourceBranch);
@@ -229,7 +222,6 @@ exports.pretest = gulp.series(cleanCoverage, setupCoveragePool);
 exports.printversion = printVersion;
 exports.setupcoveragepool = setupCoveragePool;
 exports.tag = tagVersion;
-exports.publish = gulp.series(tfxInstall, uploadExtension, tagVersion);
 exports.testnycmocha = testNycMocha;
 exports.tfxinstall = tfxInstall;
 exports.upload = uploadExtension;

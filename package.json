@@ -25,7 +25,7 @@
         "clean:build:test": "npm run clean:build && npm run test",
         "prod:clean:build": "npm run clean && npm run prod:init && npm run build",
         "prod:build:package": "npm run prod:clean:build && npm run package",
-        "publish": "npx gulp publish",
+        "publish": "npx gulp upload",
         "prod:full": "npm run prod:clean:build && sudo npm install --global tfx-cli && npm run publish"
     },
     "dependencies": {
