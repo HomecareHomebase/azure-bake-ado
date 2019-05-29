@@ -192,7 +192,7 @@ function tfxInstall(done) {
 
 function uploadExtension (done) {
     if (!params.isPullRequest && params.buildSourceBranch == 'master') {
-        gulp.series(tfxInstall, bumpVersion, publishExtension, gitCheckout, tagVersion, gitCommit)(done());
+        gulp.series(tfxInstall, bumpVersion, publishExtension, gitCheckout, gitCommit, tagVersion)(done());
     }
     else { 
         console.log('Branch: ' + params.buildSourceBranch);
