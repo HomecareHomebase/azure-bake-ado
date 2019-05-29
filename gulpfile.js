@@ -36,7 +36,7 @@ function gitAddCommit(done) {
     git config --global user.name "` + params.buildRequestedFor + `"    
     git add . && 
     git commit --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
-    git push -q origin ` + branchName;
+    git push origin ` + branchName;
     console.log('Git Script: ' + gitScript);
     return shell.task(gitScript)(done());
 }
