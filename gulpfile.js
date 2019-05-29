@@ -31,17 +31,16 @@ function gitAddCommit(done) {
         branchName = branchName.replace(/refs\/heads\/(feature\/)?/i, '');
     }
     
-    var gitScript = `sudo git checkout ` + branchName + ` && 
-    sudo git config --global user.email "` + params.buildRequestedForEmail + `" &&
-    sudo git config --global user.name "` + params.buildRequestedFor + `"    
-    sudo git add --a && 
-    sudo git commit --author '` + params.buildRequestedFor + '<' + params.buildRequestedForEmail + `>' -m "[skip ci][CHORE] Update & Publish" && 
-    sudo git push origin ` + branchName ` -q`;
+    var gitScript = `git checkout ` + branchName + ` && 
+    git config --global user.email "` + params.buildRequestedForEmail + `" &&
+    git config --global user.name "` + params.buildRequestedFor + `"    
+    git add . && 
+    git commit --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
+    git push -q origin ` + branchName;
     console.log('Git Script: ' + gitScript);
     return shell.task(gitScript)(done());
 }
 function tagVersion() {
-    bumpVersion();
     return gulp.src('./vss-extension.json').pipe(tag());
 }
 
