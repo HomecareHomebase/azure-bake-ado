@@ -34,7 +34,7 @@ function gitCommit(done) {
     
     var gitScript = `sudo git checkout ` + branchName + ` && 
     sudo git config user.email "` + params.buildRequestedForEmail + `" &&
-    sudo git config user.name "` + params.buildRequestedFor + ` &&
+    sudo git config user.name "` + params.buildRequestedFor + `" &&
     sudo git add . && 
     sudo git commit --tag '` + vss.version + `' --author '` + params.buildRequestedFor + ' <' + params.buildRequestedForEmail + `>' --message "[skip ci][CHORE] Update & Publish" && 
     sudo git push origin ` + branchName;
