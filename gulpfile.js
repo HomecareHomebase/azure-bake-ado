@@ -205,12 +205,6 @@ function writeFilenameToFile() {
     });
 }
 
-function recipeDiff() {
-	return gulp.src('components/**/*')
-		.pipe(git.diff(params.pullRequestTargetBranch, { args: "--no-commit-id --name-only", log: true }))
-		.pipe(gulp.dest(params.artifactsDirectory + '/recipes'));
-}
-
 //Tasks
 exports.analysis = gulp.series(sonarQube);
 exports.bump = bumpVersion;
