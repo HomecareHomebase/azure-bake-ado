@@ -27,12 +27,22 @@
   ],
   "inputs": [
     {
+      "name": "skipAzureConnection",
+      "type": "boolean",
+      "label": "Azure Connection",
+      "required": false,
+      "helpMarkDown": "Skip logging into Azure for recipes that have no azure based deployments",
+      "groupName": "env"
+
+    },
+    {
       "name": "azureConnection",
       "type": "connectedService:AzureRM",
       "label": "Azure Connection",
       "required": true,
       "helpMarkDown": "Select an Azure resource manager subscription for the deployment",
-      "groupName": "env"
+      "groupName": "env",
+      "visibleRule": "skipAzureConnection == false"
     },
     {
       "name": "envName",
@@ -40,7 +50,8 @@
       "label": "Environment Name",
       "required": false,
       "helpMarkDown": "If this is not assigned, will look for the pipeline variable: BAKE_ENV_NAME",
-      "groupName": "env"
+      "groupName": "env",
+      "visibleRule": "skipAzureConnection == false"
     },
     {
       "name": "envCode",
@@ -48,7 +59,8 @@
       "label": "Environment Code",
       "required": false,
       "helpMarkDown": "If this is not assigned, will look for the pipeline variable: BAKE_ENV_CODE",
-      "groupName": "env"
+      "groupName": "env",
+      "visibleRule": "skipAzureConnection == false"
     },
     {
       "name": "envRegions",
@@ -56,13 +68,14 @@
       "label": "Deployment Regions",
       "required": false,
       "helpMarkDown": "If this is not assigned, will look for the pipeline variable: BAKE_ENV_REGIONS",
-      "groupName": "env"
+      "groupName": "env",
+      "visibleRule": "skipAzureConnection == false"
     },
     {
       "name": "useKubernetes",
       "type": "boolean",
       "label": "Deploy to a Kubernetes Cluster",
-      "required": true,
+      "required": false,
       "helpMarkDown": "Bundle the kubernetes config (must run k8 task login first) into the deployment",
       "groupName": "env"
     },
@@ -74,7 +87,7 @@
       "helpMarkDown": "name of the BAKE varibale to store the kube config content",
       "groupName": "env",
       "defaultValue": "k8s_config",
-      "visibleRule": "useKubernetes = true"
+      "visibleRule": "useKubernetes == true"
     },
     {
       "name": "recipe",
