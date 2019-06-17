@@ -61,18 +61,19 @@ export class clitask {
             "BAKE_AUTH_SERVICE_ID=" + process.env.BAKE_AUTH_SERVICE_ID + "\r\n" +
             "BAKE_AUTH_SERVICE_CERT=" + (process.env.BAKE_AUTH_SERVICE_CERT || "") + "\r\n" +
             "BAKE_AUTH_SERVICE_KEY=" + (process.env.BAKE_AUTH_SERVICE_KEY || "") + "\r\n" +
-            "BAKE_VARIABLES64=" + (process.env.BAKE_VARIABLES64 || "") + "\r\n"
+            `BAKE_VARIABLES=/app/bake/.env\r\n`
 
         fs.writeFileSync(envFile, envContent)        
 
         //clear out current env vars now
         process.env.BAKE_ENV_NAME = process.env.BAKE_ENV_CODE = process.env.BAKE_ENV_REGIONs = process.env.BAKE_AUTH_SUBSCRIPTION_ID =
             process.env.BAKE_AUTH_TENANT_ID = process.env.BAKE_AUTH_SERVICE_ID = process.env.BAKE_AUTH_SERVICE_KEY = process.env.BAKE_AUTH_SERVICE_CERT =
-            process.env.BAKE_VARIABLES64 = ""
+            ""
         
         let tool = tl.tool('docker')
         let p = tool.arg('run').arg('--rm').arg('-t')
             .arg('--env-file=' + envFile)
+            .arg(`-v ${process.env.BAKE_VARIABLES}:/app/bake/.env`)
             .arg(recipe)
             .exec()
 
@@ -126,13 +127,15 @@ export class clitask {
                 !envvar.toLocaleUpperCase().startsWith("INPUT_"))
                 bakeVars += envvar + ": '" + process.env[envvar] + "'\n"
         }
-        let b64 = Buffer.from(bakeVars, 'ascii').toString('base64')
+
+        let bakeVarFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.vars')
+        fs.writeFileSync(bakeVarFile, bakeVars)
 
         console.log('Setting environment for %s (%s)', envName, envCode)
         process.env.BAKE_ENV_NAME = envName
         process.env.BAKE_ENV_CODE = envCode
         process.env.BAKE_ENV_REGIONS = envRegions
-        process.env.BAKE_VARIABLES64 = b64
+        process.env.BAKE_VARIABLES = bakeVarFile
         
     }
 
