@@ -74,7 +74,7 @@ export class clitask {
         let tool = tl.tool('docker')
         let p = tool.arg('run').arg('--rm').arg('-t')
             .arg('--env-file=' + envFile)
-            .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env`)
+            .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)
             .arg(recipe)
             .exec()
 
