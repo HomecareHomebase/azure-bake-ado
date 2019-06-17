@@ -29,7 +29,7 @@
     {
       "name": "skipAzureConnection",
       "type": "boolean",
-      "label": "Azure Connection",
+      "label": "Skip Azure Connection",
       "required": false,
       "helpMarkDown": "Skip logging into Azure for recipes that have no azure based deployments",
       "groupName": "env"
@@ -38,7 +38,7 @@
       "name": "azureConnection",
       "type": "connectedService:AzureRM",
       "label": "Azure Connection",
-      "required": true,
+      "required": false,
       "helpMarkDown": "Select an Azure resource manager subscription for the deployment",
       "groupName": "env",
       "visibleRule": "skipAzureConnection == false"
