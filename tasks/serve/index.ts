@@ -133,6 +133,7 @@ export class clitask {
 
         let bakeVarFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.vars')
         fs.writeFileSync(bakeVarFile, bakeVars)
+        fs.chmodSync(bakeVarFile, 744)
 
         if (skipAzureConnection) {
             console.log('Setting azure-less environment')
