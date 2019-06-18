@@ -12,6 +12,8 @@ pr:
     include:
     - master
     - release/v*
+    - release/*
+    - refs/tags/*
 pool:
   vmImage: 'ubuntu-16.04'
 steps:
