@@ -71,19 +71,25 @@ export class clitask {
             process.env.BAKE_AUTH_TENANT_ID = process.env.BAKE_AUTH_SERVICE_ID = process.env.BAKE_AUTH_SERVICE_KEY = process.env.BAKE_AUTH_SERVICE_CERT =
             ""
         
-        let tool = tl.tool('docker')
-        let p = tool.arg('run').arg('--rm').arg('-t')
-            .arg('--env-file=' + envFile)
-            .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)
-            .arg(recipe)
-            .exec()
+        //we need to force pull the docker image, in case the tag was local already (but old content)
+        let p = tl.tool('docker').arg('pull').arg(recipe).exec()
+        p.then(()=>{
+            let tool = tl.tool('docker')
+            p = tool.arg('run').arg('--rm').arg('-t')
+                .arg('--env-file=' + envFile)
+                .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)
+                .arg(recipe)
+                .exec()
 
-        p.then((code) => {
-            this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, code)
-        }, (err) => {
+            p.then((code) => {
+                this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, code)
+            }, (err) => {
+                this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, 2)
+            })            
+        }, (err)=>{
+            console.error('Error pulling image : ' + err)
             this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, 2)
         })
-
     }
 
     static cleanupAndExit(envFile: string, bakeVars: string, exitCode: number) {
