@@ -146,11 +146,11 @@ export class clitask {
         }
         else {
             console.log('Setting environment for %s (%s)', envName, envCode)
-            process.env.BAKE_ENV_NAME = envName
-            process.env.BAKE_ENV_CODE = envCode
-            process.env.BAKE_ENV_REGIONS = envRegions
         }
 
+        process.env.BAKE_ENV_NAME = envName
+        process.env.BAKE_ENV_CODE = envCode
+        process.env.BAKE_ENV_REGIONS = envRegions
         process.env.BAKE_VARIABLES = bakeVarFile
         
     }
