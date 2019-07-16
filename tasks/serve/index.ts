@@ -14,6 +14,7 @@ export class clitask {
             let releaseDir: string = process.env.AGENT_RELEASEDIRECTORY as string //ADO defaults to this value for recipeArtifact
             const recipeName: string = tl.getInput('recipe', false)
             const recipeArtifact: string = (tl.getInput('recipeArtifact', false) === releaseDir) ? "" : tl.getInput('recipeArtifact', false)
+            
             console.log("Is recipeArtifact specified:" + !(tl.getInput('recipeArtifact', false) === releaseDir))
 
             if (recipeName && recipeArtifact) {
@@ -50,6 +51,8 @@ export class clitask {
             console.log("Logging into registry at: " + remoteRegistry[1])
             let l = login.arg('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + ' -p ' + process.env.BAKE_AUTH_SERVICE_KEY + ' ' + remoteRegistry[1]).exec()        
         }*/
+        
+        const dockerindocker: boolean = tl.getInput('dockerindocker', false) 
 
         let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
 
@@ -78,6 +81,7 @@ export class clitask {
             p = tool.arg('run').arg('--rm').arg('-t')
                 .arg('--env-file=' + envFile)
                 .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)
+                .arg ( (dockerindocker) ? `-v /var/run/docker.sock:/var/run/docker.sock` :"")
                 .arg(recipe)
                 .exec()
 
