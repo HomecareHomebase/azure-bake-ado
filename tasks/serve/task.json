@@ -97,14 +97,6 @@
       "groupName": "general"
     },
     {
-      "name": "dockerindocker",
-      "type": "boolean",
-      "label": "Enable Docker-in-Docker",
-      "required": false,
-      "helpMarkDown": "This will mount the Docker socket",
-      "groupName": "general"
-    },
-    {
       "name": "recipeArtifact",
       "type": "filePath",
       "label": "Bake Recipe Artifact File",
