@@ -95,14 +95,6 @@
       "required": false,
       "helpMarkDown": "Either define a recipe docker tag, or use the field below to define the Devops artifact bake.artifact file",
       "groupName": "general"
-    },    
-    {
-      "name": "dockerindocker",
-      "type": "boolean",
-      "label": "Enable Docker-in-Docker",
-      "required": false,
-      "helpMarkDown": "This will mount the Docker socket",
-      "groupName": "general"
     },
     {
       "name": "recipeArtifact",

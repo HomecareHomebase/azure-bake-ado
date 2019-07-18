@@ -52,7 +52,7 @@ export class clitask {
             let l = login.arg('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + ' -p ' + process.env.BAKE_AUTH_SERVICE_KEY + ' ' + remoteRegistry[1]).exec()        
         }*/
         
-        let dockerindocker: boolean = tl.getBoolInput('dockerindocker') 
+       // let dockerindocker: boolean = tl.getBoolInput('dockerindocker') 
 
         let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
 
@@ -82,10 +82,10 @@ export class clitask {
             let args = tool.arg('run').arg('--rm').arg('-t')
                 .arg('--env-file=' + envFile)
                 .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)                
-            if (dockerindocker === true)                
-                { 
-                    args= args.arg(`-v=/var/run/docker.sock:/var/run/docker.sock`)
-                }
+            //if (dockerindocker === true)                
+            //    { 
+            //        args= args.arg(`-v=/var/run/docker.sock:/var/run/docker.sock`)
+            //    }
                  p = args.arg(recipe)
                      .exec()
             p.then((code) => {
