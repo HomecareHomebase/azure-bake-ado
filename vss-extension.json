@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "azure-bake",
   "name": "Azure Bake Tools",
-  "version": "0.1.139",
+  "version": "0.1.140",
   "publisher": "HomecareHomebase",
   "icons": {
     "default": "tools-icon.png"
