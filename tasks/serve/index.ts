@@ -82,7 +82,7 @@ export class clitask {
             let args = tool.arg('run').arg('--rm').arg('-t')
                 .arg('--env-file=' + envFile)
                 .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)                
-            if (dockerindocker)                
+            if (dockerindocker === true)                
                 { 
                     args= args.arg(`-v=/var/run/docker.sock:/var/run/docker.sock`)
                 }
