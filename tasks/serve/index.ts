@@ -52,7 +52,7 @@ export class clitask {
             let l = login.arg('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + ' -p ' + process.env.BAKE_AUTH_SERVICE_KEY + ' ' + remoteRegistry[1]).exec()        
         }*/
         
-        const dockerindocker: boolean = tl.getInput('dockerindocker', false) 
+        let dockerindocker: boolean = tl.getBoolInput('dockerindocker') 
 
         let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
 
