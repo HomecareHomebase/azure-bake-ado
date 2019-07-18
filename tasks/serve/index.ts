@@ -75,16 +75,19 @@ export class clitask {
             ""
         
         //we need to force pull the docker image, in case the tag was local already (but old content)
-        let p = tl.tool('docker').arg('pull').arg(recipe).exec()
+        let p = tl.tool('docker').arg('pull').arg(recipe).exec()        
         p.then(()=>{
             let tool = tl.tool('docker')
-            p = tool.arg('run').arg('--rm').arg('-t')
-                .arg('--env-file=' + envFile)
-                .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)
-                .arg ( (dockerindocker) ? `-v /var/run/docker.sock:/var/run/docker.sock` :"")
-                .arg(recipe)
-                .exec()
 
+            let args = tool.arg('run').arg('--rm').arg('-t')
+                .arg('--env-file=' + envFile)
+                .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)                
+            if (dockerindocker)                
+                { 
+                    args= args.arg(`-v=/var/run/docker.sock:/var/run/docker.sock`)
+                }
+                 p = args.arg(recipe)
+                     .exec()
             p.then((code) => {
                 this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, code)
             }, (err) => {
