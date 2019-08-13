@@ -9,7 +9,7 @@
   "version": {
     "Major": 0,
     "Minor": 1,
-    "Patch": 140
+    "Patch": 141
   },
   "instanceNameFormat": "Azure Bake Serve",
   "showEnvironmentVariables": true,
