@@ -134,6 +134,7 @@ export class clitask {
                     {
                         //write the artifact file if set.
                         if (useArtifact){
+                            artifactTag = artifactTag.toLocaleLowerCase();
                             console.log('Generating artifact file against image tag ' + artifactTag)
 
                             tl.mkdirP(artifactOutput)

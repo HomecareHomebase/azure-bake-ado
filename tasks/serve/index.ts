@@ -43,6 +43,8 @@ export class clitask {
             console.log('Deploying Bake recipe via Artifact output | ' + recipe)
         }        
 
+        recipe = recipe.toLocaleLowerCase()
+
         /*RegEx to determine if it is local or remote Docker Registry
         let remoteRegistry = recipe.match(/(.*)[\/.*]/)
         let login = tl.tool('docker')
