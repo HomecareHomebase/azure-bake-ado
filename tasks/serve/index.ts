@@ -54,8 +54,8 @@ export class clitask {
             let l = login.arg('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + ' -p ' + process.env.BAKE_AUTH_SERVICE_KEY + ' ' + remoteRegistry[1]).exec()        
         }*/
         
-       // let dockerindocker: boolean = tl.getBoolInput('dockerindocker') 
-
+        let dockerOptions: string = "" 
+        
         let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
 
         let envContent = "BAKE_ENV_NAME=" + (process.env.BAKE_ENV_NAME || "") + "\r\n" +
@@ -71,6 +71,7 @@ export class clitask {
 
         fs.writeFileSync(envFile, envContent)
 
+        
         //clear out current env vars now
         process.env.BAKE_ENV_NAME = process.env.BAKE_ENV_CODE = process.env.BAKE_ENV_REGIONs = process.env.BAKE_AUTH_SUBSCRIPTION_ID =
             process.env.BAKE_AUTH_TENANT_ID = process.env.BAKE_AUTH_SERVICE_ID = process.env.BAKE_AUTH_SERVICE_KEY = process.env.BAKE_AUTH_SERVICE_CERT =
@@ -79,15 +80,20 @@ export class clitask {
         //we need to force pull the docker image, in case the tag was local already (but old content)
         let p = tl.tool('docker').arg('pull').arg(recipe).exec()        
         p.then(()=>{
+
+            //Get the Docker Options    
+            dockerOptions = tl.getInput('dockerOptions', false) 
+
             let tool = tl.tool('docker')
 
             let args = tool.arg('run').arg('--rm').arg('-t')
                 .arg('--env-file=' + envFile)
                 .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)                
-            //if (dockerindocker === true)                
-            //    { 
-            //        args= args.arg(`-v=/var/run/docker.sock:/var/run/docker.sock`)
-            //    }
+            
+                //Add Docker Options, if exists
+            if (dockerOptions) {
+                    args= args.arg(dockerOptions)            
+                }
                  p = args.arg(recipe)
                      .exec()
             p.then((code) => {
