@@ -80,9 +80,9 @@ export class clitask {
         //we need to force pull the docker image, in case the tag was local already (but old content)
         let p = tl.tool('docker').arg('pull').arg(recipe).exec()        
         p.then(()=>{
-            
+
             //Get the Docker Options    
-            dockerOptions = tl.getInput('dockerOptions') 
+            dockerOptions = tl.getInput('dockerOptions', false) 
 
             let tool = tl.tool('docker')
 
