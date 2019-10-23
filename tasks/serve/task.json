@@ -97,6 +97,14 @@
       "groupName": "general"
     },
     {
+      "name": "dockerOptions",
+      "type": "string",
+      "label": "Docker Options",
+      "required": false,
+      "helpMarkDown": "To pass through docker options to override values, such as --dns-search=values",
+      "groupName": "general"
+    },
+    {
       "name": "recipeArtifact",
       "type": "filePath",
       "label": "Bake Recipe Artifact File",
