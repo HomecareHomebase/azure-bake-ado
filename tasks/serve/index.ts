@@ -55,7 +55,9 @@ export class clitask {
         }*/
         
        // let dockerindocker: boolean = tl.getBoolInput('dockerindocker') 
-
+        var _execOptions = <IExecOptions> { failOnStdErr: true,
+                            ignoreReturnCode: false } 
+        
         let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
 
         let envContent = "BAKE_ENV_NAME=" + (process.env.BAKE_ENV_NAME || "") + "\r\n" +
@@ -89,7 +91,7 @@ export class clitask {
             //        args= args.arg(`-v=/var/run/docker.sock:/var/run/docker.sock`)
             //    }
                  p = args.arg(recipe)
-                     .exec()
+                     .exec(_execOptions) 
             p.then((code) => {
                 this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, code)
             }, (err) => {
