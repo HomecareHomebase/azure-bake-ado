@@ -12,6 +12,7 @@ export class clitask {
 
         try {
             let releaseDir: string = process.env.AGENT_RELEASEDIRECTORY as string //ADO defaults to this value for recipeArtifact
+            const rootCaFile: string = tl.getInput('rootCaFile', false)
             const recipeName: string = tl.getInput('recipe', false)
             const recipeArtifact: string = (tl.getInput('recipeArtifact', false) === releaseDir) ? "" : tl.getInput('recipeArtifact', false)
             
@@ -29,13 +30,13 @@ export class clitask {
             this.setupKubernetesConfig()
             this.setupEnvironment()
 
-            this.deployImage(recipeName, recipeArtifact)
+            this.deployImage(recipeName, recipeArtifact, rootCaFile)
         } catch (err) {
             tl.setResult(tl.TaskResult.Failed, err.message);
         }
 
     }
-    static deployImage(recipe: string, recipeFile: string): void {
+    static deployImage(recipe: string, recipeFile: string, rootCaFile: string | undefined | null = null): void {
 
         if (recipeFile) {
             let contents = fs.readFileSync(recipeFile)
@@ -71,6 +72,11 @@ export class clitask {
             "BAKE_AUTH_SKIP=" + (process.env.BAKE_AUTH_SKIP || "false") + "\r\n" +
             `BAKE_VARIABLES=/app/bake/.env\r\n`
 
+        if (rootCaFile){
+            console.log('Injecting custom root CA File: ' + rootCaFile)
+            envContent += 'NODE_EXTRA_CA_CERTS=/app/ca.crt\r\n'
+        }
+
         fs.writeFileSync(envFile, envContent)
 
         //clear out current env vars now
@@ -85,13 +91,14 @@ export class clitask {
 
             let args = tool.arg('run').arg('--rm').arg('-t')
                 .arg('--env-file=' + envFile)
-                .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)                
-            //if (dockerindocker === true)                
-            //    { 
-            //        args= args.arg(`-v=/var/run/docker.sock:/var/run/docker.sock`)
-            //    }
-                 p = args.arg(recipe)
-                     .exec(_execOptions) 
+                .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)
+            
+            if (rootCaFile){
+                args = args.arg(`-v=${rootCaFile}:/app/ca.crt:Z`)
+            }
+
+            p = args.arg(recipe)
+                .exec(_execOptions) 
             p.then((code) => {
                 this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, code)
             }, (err) => {
