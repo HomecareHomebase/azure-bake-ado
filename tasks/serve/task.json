@@ -89,6 +89,15 @@
       "visibleRule": "useKubernetes == true"
     },
     {
+      "name": "rootCaFile",
+      "type": "string",
+      "label": "Root CA File",
+      "required": false,
+      "helpMarkDown": "Optional file path to a root CA PEM file to be used by node in bake",
+      "groupName": "env",
+      "defaultValue": ""
+    },
+    {
       "name": "recipe",
       "type": "string",
       "label": "Bake Recipe Docker Tag",
