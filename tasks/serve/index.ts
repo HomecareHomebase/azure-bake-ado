@@ -70,6 +70,7 @@ export class clitask {
             "BAKE_AUTH_SERVICE_CERT=" + (process.env.BAKE_AUTH_SERVICE_CERT || "") + "\r\n" +
             "BAKE_AUTH_SERVICE_KEY=" + (process.env.BAKE_AUTH_SERVICE_KEY || "") + "\r\n" +
             "BAKE_AUTH_SKIP=" + (process.env.BAKE_AUTH_SKIP || "false") + "\r\n" +
+            "BAKE_LOG_LEVEL=" + (process.env.BAKE_LOG_LEVEL || "info") + "\r\n" +
             `BAKE_VARIABLES=/app/bake/.env\r\n`
 
         if (rootCaFile){
