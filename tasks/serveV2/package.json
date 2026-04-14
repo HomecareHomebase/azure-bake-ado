@@ -1,5 +1,5 @@
 {
-  "name": "Azure-Bake-Mix",
+  "name": "Azure-Bake-Serve",
   "version": "1.0.0",
   "description": "A plugin to use the Bake IaC deployment system for Azure",
   "main": "index.js",
@@ -17,8 +17,7 @@
   "author": "HomecareHomebase",
   "license": "ISC",
   "dependencies": {
-    "azure-pipelines-task-lib": "^2.8.0",
-    "docker-common": "file:../../imports/docker-common-1.0.0.tgz",
+    "azure-pipelines-task-lib": "^4.0.0",
     "@types/node": "^11.13.1",
     "@types/q": "^1.5.2"
   },

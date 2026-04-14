@@ -21,8 +21,14 @@
       "path": "tasks/mix"
     },
     {
+      "path": "tasks/mixV2"
+    },
+    {
       "path": "tasks/serve"
-    }      
+    },
+    {
+      "path": "tasks/serveV2"
+    }
   ],
   "contributions": [
     {
@@ -36,6 +42,16 @@
       }
     },
     {
+      "id": "azure-bake-mix-v2",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "tasks/mixV2"
+      }
+    },
+    {
       "id": "azure-bake-serve",
       "type": "ms.vss-distributed-task.task",
       "targets": [
@@ -43,6 +59,16 @@
       ],
       "properties": {
         "name": "tasks/serve"
+      }
+    },
+    {
+      "id": "azure-bake-serve-v2",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "tasks/serveV2"
       }
     }
   ]
