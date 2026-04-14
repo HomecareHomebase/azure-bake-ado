@@ -209,7 +209,7 @@ export class clitask {
         return sourceToTargetMapping;
     }
 
-    static dockerTag(connection: ContainerConnection, sourceImage: string, targetImage: string): Q.Promise<void> {
+    static dockerTag(connection: ContainerConnection, sourceImage: string, targetImage: string): Promise<void> {
         let command = connection.createCommand();
         command.arg("tag");
         command.arg(sourceImage);
