@@ -87,11 +87,15 @@ export class clitask {
                 tl.mkdirP(toolPath)
             }
 
-            tl.execSync('npm', 'install azure-bake',<IExecOptions>{
+            const installResult = tl.execSync('npm', 'install azure-bake',<IExecOptions>{
                 cwd : toolPath,
                 silent: true
             })
 
+            if (installResult.code !== 0) {
+                const installError = installResult.stderr || installResult.stdout || ('exit code ' + installResult.code);
+                throw new Error('Failed to install azure-bake: ' + installError);
+            }
 
             //executing bake mix
             let bakeTool = tl.tool('npx')

@@ -44,7 +44,7 @@ export class clitask {
             console.log('Deploying Bake recipe via Artifact output | ' + recipe)
         }        
 
-        recipe = recipe.toLocaleLowerCase()
+        recipe = recipe.toLowerCase()
 
         /*RegEx to determine if it is local or remote Docker Registry
         let remoteRegistry = recipe.match(/(.*)[\/.*]/)
@@ -98,6 +98,11 @@ export class clitask {
                 args = args.arg(`-v=${rootCaFile}:/app/ca.crt:Z`)
             }
 
+            let certHostPath = process.env.BAKE_AUTH_SERVICE_CERT_HOST_PATH
+            if (certHostPath) {
+                args = args.arg(`-v=${certHostPath}:/app/spnCert.pem:Z`)
+            }
+
             p = args.arg(recipe)
                 .exec(_execOptions) 
             p.then((code) => {
@@ -148,11 +153,11 @@ export class clitask {
         }
 
         //gather up all environment variables.
+        const secretPrefixes = ["BAKE_", "ENDPOINT_", "INPUT_", "SECRET_", "SYSTEM_ACCESSTOKEN", "VSMARKETPLACETOKEN"]
         let bakeVars: string = ""
         for (let envvar in process.env) {
-            if (!envvar.toLocaleUpperCase().startsWith("BAKE_") &&
-                !envvar.toLocaleUpperCase().startsWith("ENDPOINT_") &&
-                !envvar.toLocaleUpperCase().startsWith("INPUT_"))
+            const upperVar = envvar.toUpperCase()
+            if (!secretPrefixes.some(prefix => upperVar.startsWith(prefix)))
                 bakeVars += envvar + ": '" + process.env[envvar] + "'\n"
         }
 
@@ -223,13 +228,14 @@ export class clitask {
         let authType: string = tl.getEndpointAuthorizationParameter(connectedService, 'authenticationType', true)
         let cliPassword: string = ""
         let cliPasswordPath: string = ""
+        let certHostPath: string = ""
         let servicePrincipalKey: string = ""
         if (authType == "spnCertificate") {
             tl.debug('certificate based endpoint')
             let certificateContent: string = tl.getEndpointAuthorizationParameter(connectedService, "servicePrincipalCertificate", false)
-            cliPassword = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory'), 'spnCert.pem')
-            fs.writeFileSync(cliPassword, certificateContent)
-            cliPasswordPath = cliPassword
+            certHostPath = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory'), 'spnCert.pem')
+            fs.writeFileSync(certHostPath, certificateContent)
+            cliPasswordPath = '/app/spnCert.pem'
 
         }
         else {
@@ -247,6 +253,7 @@ export class clitask {
         process.env.BAKE_AUTH_SERVICE_ID = servicePrincipalId
         process.env.BAKE_AUTH_SERVICE_KEY = servicePrincipalKey
         process.env.BAKE_AUTH_SERVICE_CERT = cliPasswordPath
+        process.env.BAKE_AUTH_SERVICE_CERT_HOST_PATH = certHostPath
 
         console.log('Setting up authentication for SUBID=%s TID=%s', subscriptionID, tenantId)
 

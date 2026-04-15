@@ -17,7 +17,6 @@
         "clean": "git clean -fdX",
         "build:tasks": "npm run compile:tasks",
         "build": "npm run build:tasks",
-        "sonarqube": "npx gulp coveragesonarqube",
         "package": "npx gulp package",
         "clean:build": "npm run clean && npm run dev:init && npm run build",
         "clean:build:test": "npm run clean:build",
