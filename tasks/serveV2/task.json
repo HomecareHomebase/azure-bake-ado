@@ -12,7 +12,7 @@
     "Patch": 0
   },
   "instanceNameFormat": "Azure Bake Serve",
-  "showEnvironmentVariables": true,
+  "showEnvironmentVariables": false,
   "groups": [
     {
       "name": "env",
