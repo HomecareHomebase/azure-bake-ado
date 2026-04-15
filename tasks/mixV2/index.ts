@@ -147,7 +147,7 @@ export class clitask {
     }
 
     static getImageName(): string {
-        var imageName = tl.getInput("imageName", true);
+        const imageName = tl.getInput("imageName", true);
         return imageUtils.generateValidImageName(imageName);
     }
 
@@ -207,8 +207,8 @@ export class clitask {
         return connection.execCommand(command);
     }
 
-    static dockerPush(connection: ContainerConnection, image: string): any {
-        var command = connection.createCommand();
+    static dockerPush(connection: ContainerConnection, image: string): Promise<void> {
+        const command = connection.createCommand();
         command.arg("push");
         command.arg(image);
 

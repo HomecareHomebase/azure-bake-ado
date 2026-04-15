@@ -55,7 +55,7 @@ export class clitask {
         }*/
         
        // let dockerindocker: boolean = tl.getBoolInput('dockerindocker') 
-        var _execOptions = <IExecOptions> { failOnStdErr: true,
+        const _execOptions = <IExecOptions> { failOnStdErr: true,
                             ignoreReturnCode: false } 
         
         let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
@@ -215,23 +215,22 @@ export class clitask {
     static setupCredentials(): void {
 
         //check if we should skip azure connection usage.
-        var skipAzureConnection: boolean = tl.getBoolInput("skipAzureConnection")
+        const skipAzureConnection: boolean = tl.getBoolInput("skipAzureConnection")
         process.env.BAKE_AUTH_SKIP = skipAzureConnection.toString()
         if (skipAzureConnection){
             return
         }
 
-        var connectedService: string = tl.getInput("azureConnection", true)
+        const connectedService: string = tl.getInput("azureConnection", true)
 
         let servicePrincipalId: string = tl.getEndpointAuthorizationParameter(connectedService, "serviceprincipalid", false)
         let authType: string = tl.getEndpointAuthorizationParameter(connectedService, 'authenticationType', true)
-        let cliPassword: string = ""
         let cliPasswordPath: string = ""
         let certHostPath: string = ""
         let servicePrincipalKey: string = ""
         if (authType == "spnCertificate") {
             tl.debug('certificate based endpoint')
-            let certificateContent: string = tl.getEndpointAuthorizationParameter(connectedService, "servicePrincipalCertificate", false)
+            const certificateContent: string = tl.getEndpointAuthorizationParameter(connectedService, "servicePrincipalCertificate", false)
             certHostPath = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory'), 'spnCert.pem')
             fs.writeFileSync(certHostPath, certificateContent)
             cliPasswordPath = '/app/spnCert.pem'
@@ -239,12 +238,11 @@ export class clitask {
         }
         else {
             tl.debug('key based endpoint')
-            cliPassword = tl.getEndpointAuthorizationParameter(connectedService, "serviceprincipalkey", false)
-            servicePrincipalKey = cliPassword
+            servicePrincipalKey = tl.getEndpointAuthorizationParameter(connectedService, "serviceprincipalkey", false)
         }
 
-        var tenantId: string = tl.getEndpointAuthorizationParameter(connectedService, "tenantid", false)
-        var subscriptionID: string = tl.getEndpointDataParameter(connectedService, "SubscriptionID", true)
+        const tenantId: string = tl.getEndpointAuthorizationParameter(connectedService, "tenantid", false)
+        const subscriptionID: string = tl.getEndpointDataParameter(connectedService, "SubscriptionID", true)
 
         //assign to env vars so we can pass in later.
         process.env.BAKE_AUTH_SUBSCRIPTION_ID = subscriptionID
