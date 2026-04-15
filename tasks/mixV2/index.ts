@@ -95,7 +95,7 @@ export class clitask {
 
             //executing bake mix
             let bakeTool = tl.tool('npx')
-            let results = bakeTool.arg('bake').arg('mix')
+            let code = await bakeTool.arg('bake').arg('mix')
                 .arg('--runtime='+runtimeVersion)
                 .arg('--name='+imageName)
                 .arg(bakeFile)
@@ -103,54 +103,38 @@ export class clitask {
                     cwd : toolPath
                 })
 
-            results.then((code)=>{
-                if (code !=0)
-                {
-                    throw new Error()
-                }
+            if (code != 0) {
+                throw new Error('Bake mix failed with exit code ' + code)
+            }
 
-                //tag the base image
-                console.log('Tagging bake recipe')
+            //tag the base image
+            console.log('Tagging bake recipe')
 
-                let firstMapping = imageMappings.shift() || <ImageMapping>{};
-                let promise = this.dockerTag(connection, firstMapping.sourceImageName, firstMapping.targetImageName);
-                imageMappings.forEach(mapping => {
-                    promise = promise.then(() => this.dockerTag(connection, mapping.sourceImageName, mapping.targetImageName));
-                });
+            let firstMapping = imageMappings.shift() || <ImageMapping>{};
+            await this.dockerTag(connection, firstMapping.sourceImageName, firstMapping.targetImageName);
+            for (const mapping of imageMappings) {
+                await this.dockerTag(connection, mapping.sourceImageName, mapping.targetImageName);
+            }
 
-                promise.then(()=>
-                {
-                    //push all tags
-                    console.log('Pushing bake recipe to remote registry')
+            //push all tags
+            console.log('Pushing bake recipe to remote registry')
 
-                    imageMappings = this.getImageMappings(connection, imageNames, tags);
-                    let firstImageMapping = imageMappings.shift() || <ImageMapping>{};
-                    let promisePush = this.dockerPush(connection, firstImageMapping.targetImageName);
-                    imageMappings.forEach(imageMapping => {
-                        promisePush = promisePush.then(() => this.dockerPush(connection, imageMapping.targetImageName));
-                    });
+            imageMappings = this.getImageMappings(connection, imageNames, tags);
+            let firstImageMapping = imageMappings.shift() || <ImageMapping>{};
+            await this.dockerPush(connection, firstImageMapping.targetImageName);
+            for (const imageMapping of imageMappings) {
+                await this.dockerPush(connection, imageMapping.targetImageName);
+            }
 
-                    promisePush.then(()=>
-                    {
-                        //write the artifact file if set.
-                        if (useArtifact){
-                            artifactTag = artifactTag.toLocaleLowerCase();
-                            console.log('Generating artifact file against image tag ' + artifactTag)
+            //write the artifact file if set.
+            if (useArtifact){
+                artifactTag = artifactTag.toLocaleLowerCase();
+                console.log('Generating artifact file against image tag ' + artifactTag)
 
-                            tl.mkdirP(artifactOutput)
-                            let artifactFile = path.join(artifactOutput, 'bake.artifact')
-                            tl.writeFile(artifactFile,artifactTag)
-                        }
-                    })
-
-                })
-
-
-            },(err )=>
-            {
-                console.log(err)
-                throw new Error(err)
-            })
+                tl.mkdirP(artifactOutput)
+                let artifactFile = path.join(artifactOutput, 'bake.artifact')
+                tl.writeFile(artifactFile,artifactTag)
+            }
 
         } catch (err){
             console.error(err)

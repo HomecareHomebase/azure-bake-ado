@@ -83,7 +83,7 @@
       "type": "string",
       "label": "Token Name",
       "required": false,
-      "helpMarkDown": "name of the BAKE varibale to store the kube config content",
+      "helpMarkDown": "name of the BAKE variable to store the kube config content",
       "groupName": "env",
       "defaultValue": "k8s_config",
       "visibleRule": "useKubernetes == true"

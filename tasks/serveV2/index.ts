@@ -81,7 +81,7 @@ export class clitask {
         fs.writeFileSync(envFile, envContent)
 
         //clear out current env vars now
-        process.env.BAKE_ENV_NAME = process.env.BAKE_ENV_CODE = process.env.BAKE_ENV_REGIONs = process.env.BAKE_AUTH_SUBSCRIPTION_ID =
+        process.env.BAKE_ENV_NAME = process.env.BAKE_ENV_CODE = process.env.BAKE_ENV_REGIONS = process.env.BAKE_AUTH_SUBSCRIPTION_ID =
             process.env.BAKE_AUTH_TENANT_ID = process.env.BAKE_AUTH_SERVICE_ID = process.env.BAKE_AUTH_SERVICE_KEY = process.env.BAKE_AUTH_SERVICE_CERT =
             ""
         
@@ -158,7 +158,7 @@ export class clitask {
 
         let bakeVarFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.vars')
         fs.writeFileSync(bakeVarFile, bakeVars)
-        fs.chmodSync(bakeVarFile, 744)
+        fs.chmodSync(bakeVarFile, 0o744)
 
         if (skipAzureConnection) {
             console.log('Setting azure-less environment')
@@ -190,17 +190,17 @@ export class clitask {
         let kubeConfig = tl.getVariable("KUBECONFIG")
         if (!kubeConfig){
             tl.error("KUBECONFIG variable is not defined, can't bundle config file!")
-            throw new Error()
+            throw new Error("KUBECONFIG variable is not defined, can't bundle config file!")
         }
 
         if (!fs.existsSync(kubeConfig)) {
-            tl.error("$(kubeConfig) doesn't exist, can't bundle config file!")
-            throw new Error()
+            tl.error(`${kubeConfig} doesn't exist, can't bundle config file!`)
+            throw new Error(`${kubeConfig} doesn't exist, can't bundle config file!`)
         }
 
         if (!configToken){
             tl.error("Did not define a token for config data, can't bundle config file!")
-            throw new Error()
+            throw new Error("Did not define a token for config data, can't bundle config file!")
         }
 
         let data = fs.readFileSync(kubeConfig)
