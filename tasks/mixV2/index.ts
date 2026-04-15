@@ -32,9 +32,9 @@ export class clitask {
 
             const registryAuthenticationToken = authenticationProvider.getAuthenticationToken();
 
-            // Connect to any specified container host and/or registry
+            // Connect to the configured registry using the default/local container host
             const connection = new ContainerConnection();
-            connection.open(tl.getInput("dockerHostEndpoint"), registryAuthenticationToken);
+            connection.open(undefined, registryAuthenticationToken);
 
             const runtimeVersion: string = tl.getInput('runtimeVersion', true)
             const bakeFile: string = tl.getInput('bakeFile', true)
