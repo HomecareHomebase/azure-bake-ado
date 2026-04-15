@@ -17,11 +17,11 @@ export class clitask {
 
         try{
 
-            let registryType = tl.getInput("containerregistrytype", true);
+            const registryType = tl.getInput("containerregistrytype", true);
             let authenticationProvider : AuthenticationTokenProvider;
 
 
-            if(registryType ==  "Azure Container Registry"){
+            if(registryType ===  "Azure Container Registry"){
                 authenticationProvider =
                     new ACRAuthenticationTokenProvider(tl.getInput("azureSubscriptionEndpoint"), tl.getInput("azureContainerRegistry"));
             }
@@ -30,7 +30,7 @@ export class clitask {
                     new GenericAuthenticationTokenProvider(tl.getInput("dockerRegistryEndpoint"));
             }
 
-            let registryAuthenticationToken = authenticationProvider.getAuthenticationToken();
+            const registryAuthenticationToken = authenticationProvider.getAuthenticationToken();
 
             // Connect to any specified container host and/or registry
             const connection = new ContainerConnection();
@@ -58,29 +58,29 @@ export class clitask {
                 }
             }
 
-            let imageName = this.getImageName()
-            let imageNames = [imageName]
+            const imageName = this.getImageName()
+            const imageNames = [imageName]
             let imageMappings = this.getImageMappings(connection, imageNames, tags);
 
             if (useArtifact && useLatestTag){
 
-                let tmpTags: string[] = new Array<string>()
-                let tmpImageMappings = this.getImageMappings(connection, imageNames, tmpTags)
-                if (tmpImageMappings.length == 1)
+                const tmpTags: string[] = new Array<string>()
+                const tmpImageMappings = this.getImageMappings(connection, imageNames, tmpTags)
+                if (tmpImageMappings.length === 1)
                     throw new Error('There are no source code tags to use as the artifact tag')
 
                 artifactTag = tmpImageMappings[1].targetImageName
             }
             else if (useArtifact){
                 //fix up the input image name to include registry if needed, etc.
-                let qualifyImageName = tl.getBoolInput("qualifyImageName");
+                const qualifyImageName = tl.getBoolInput("qualifyImageName");
                 artifactTag = imageUtils.imageNameWithoutTag(imageName) + ":" + artifactTag
                 artifactTag = qualifyImageName ? connection.qualifyImageName(artifactTag) : artifactTag;
             }
 
 
-            let tmpDir = tl.getVariable('agent.tempdirectory')
-            let toolPath = path.join(tmpDir, 'bake')
+            const tmpDir = tl.getVariable('agent.tempdirectory')
+            const toolPath = path.join(tmpDir, 'bake')
 
             console.log('Installing Bake cli tool')
             if (!fs.existsSync(toolPath)) {
@@ -98,8 +98,8 @@ export class clitask {
             }
 
             //executing bake mix
-            let bakeTool = tl.tool('npx')
-            let code = await bakeTool.arg('bake').arg('mix')
+            const bakeTool = tl.tool('npx')
+            const code = await bakeTool.arg('bake').arg('mix')
                 .arg('--runtime='+runtimeVersion)
                 .arg('--name='+imageName)
                 .arg(bakeFile)
@@ -107,14 +107,14 @@ export class clitask {
                     cwd : toolPath
                 })
 
-            if (code != 0) {
+            if (code !== 0) {
                 throw new Error('Bake mix failed with exit code ' + code)
             }
 
             //tag the base image
             console.log('Tagging bake recipe')
 
-            let firstMapping = imageMappings.shift() || <ImageMapping>{};
+            const firstMapping = imageMappings.shift() || <ImageMapping>{};
             await this.dockerTag(connection, firstMapping.sourceImageName, firstMapping.targetImageName);
             for (const mapping of imageMappings) {
                 await this.dockerTag(connection, mapping.sourceImageName, mapping.targetImageName);
@@ -124,7 +124,7 @@ export class clitask {
             console.log('Pushing bake recipe to remote registry')
 
             imageMappings = this.getImageMappings(connection, imageNames, tags);
-            let firstImageMapping = imageMappings.shift() || <ImageMapping>{};
+            const firstImageMapping = imageMappings.shift() || <ImageMapping>{};
             await this.dockerPush(connection, firstImageMapping.targetImageName);
             for (const imageMapping of imageMappings) {
                 await this.dockerPush(connection, imageMapping.targetImageName);
@@ -136,13 +136,14 @@ export class clitask {
                 console.log('Generating artifact file against image tag ' + artifactTag)
 
                 tl.mkdirP(artifactOutput)
-                let artifactFile = path.join(artifactOutput, 'bake.artifact')
+                const artifactFile = path.join(artifactOutput, 'bake.artifact')
                 tl.writeFile(artifactFile,artifactTag)
             }
 
         } catch (err){
             console.error(err)
-            tl.setResult(tl.TaskResult.Failed, err.message);
+            const message = err instanceof Error ? err.message : String(err);
+            tl.setResult(tl.TaskResult.Failed, message);
         }
     }
 
@@ -152,9 +153,9 @@ export class clitask {
     }
 
     static getImageMappings(connection: ContainerConnection, imageNames: string[], additionalImageTags: string[]): ImageMapping[] {
-        let qualifyImageName = tl.getBoolInput("qualifyImageName");
-        let imageInfos: ImageInfo[] = imageNames.map(imageName => {
-            let qualifiedImageName = qualifyImageName ? connection.qualifyImageName(imageName) : imageName;
+        const qualifyImageName = tl.getBoolInput("qualifyImageName");
+        const imageInfos: ImageInfo[] = imageNames.map(imageName => {
+            const qualifiedImageName = qualifyImageName ? connection.qualifyImageName(imageName) : imageName;
             return {
                 sourceImageName: imageName,
                 qualifiedImageName: qualifiedImageName,
@@ -163,7 +164,7 @@ export class clitask {
             };
         });
 
-        let includeSourceTags = tl.getBoolInput("includeSourceTags");
+        const includeSourceTags = tl.getBoolInput("includeSourceTags");
 
         let sourceTags: string[] = [];
         if (includeSourceTags) {
@@ -184,7 +185,7 @@ export class clitask {
         }
 
         // Flatten the image infos into a mapping between the source images and each of their tagged target images
-        let sourceToTargetMapping: ImageMapping[] = [];
+        const sourceToTargetMapping: ImageMapping[] = [];
         imageInfos.forEach(imageInfo => {
             imageInfo.taggedImages.forEach(taggedImage => {
                 sourceToTargetMapping.push({
@@ -198,7 +199,7 @@ export class clitask {
     }
 
     static dockerTag(connection: ContainerConnection, sourceImage: string, targetImage: string): Promise<void> {
-        let command = connection.createCommand();
+        const command = connection.createCommand();
         command.arg("tag");
         command.arg(sourceImage);
         command.arg(targetImage);

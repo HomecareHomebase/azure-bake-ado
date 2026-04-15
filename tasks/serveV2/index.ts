@@ -10,7 +10,7 @@ export class clitask {
     public static async runMain() {
 
         try {
-            let releaseDir: string = process.env.AGENT_RELEASEDIRECTORY as string //ADO defaults to this value for recipeArtifact
+            const releaseDir: string = process.env.AGENT_RELEASEDIRECTORY as string //ADO defaults to this value for recipeArtifact
             const rootCaFile: string = tl.getInput('rootCaFile', false)
             const recipeName: string = tl.getInput('recipe', false)
             const recipeArtifact: string = (tl.getInput('recipeArtifact', false) === releaseDir) ? "" : tl.getInput('recipeArtifact', false)
@@ -31,14 +31,15 @@ export class clitask {
 
             this.deployImage(recipeName, recipeArtifact, rootCaFile)
         } catch (err) {
-            tl.setResult(tl.TaskResult.Failed, err.message);
+            const message = err instanceof Error ? err.message : String(err);
+            tl.setResult(tl.TaskResult.Failed, message);
         }
 
     }
     static deployImage(recipe: string, recipeFile: string, rootCaFile: string | undefined | null = null): void {
 
         if (recipeFile) {
-            let contents = fs.readFileSync(recipeFile)
+            const contents = fs.readFileSync(recipeFile)
             recipe = contents.toString()
             console.log('Deploying Bake recipe via Artifact output | ' + recipe)
         }        
@@ -58,7 +59,7 @@ export class clitask {
         const _execOptions = <IExecOptions> { failOnStdErr: true,
                             ignoreReturnCode: false } 
         
-        let envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
+        const envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
 
         let envContent = "BAKE_ENV_NAME=" + (process.env.BAKE_ENV_NAME || "") + "\r\n" +
             "BAKE_ENV_CODE=" + (process.env.BAKE_ENV_CODE || "") + "\r\n" +
@@ -87,7 +88,7 @@ export class clitask {
         //we need to force pull the docker image, in case the tag was local already (but old content)
         let p = tl.tool('docker').arg('pull').arg(recipe).exec()        
         p.then(()=>{
-            let tool = tl.tool('docker')
+            const tool = tl.tool('docker')
 
             let args = tool.arg('run').arg('--rm').arg('-t')
                 .arg('--env-file=' + envFile)
@@ -97,7 +98,7 @@ export class clitask {
                 args = args.arg(`-v=${rootCaFile}:/app/ca.crt:Z`)
             }
 
-            let certHostPath = process.env.BAKE_AUTH_SERVICE_CERT_HOST_PATH
+            const certHostPath = process.env.BAKE_AUTH_SERVICE_CERT_HOST_PATH
             if (certHostPath) {
                 args = args.arg(`-v=${certHostPath}:/app/spnCert.pem:Z`)
             }
@@ -118,7 +119,7 @@ export class clitask {
     static cleanupAndExit(envFile: string, bakeVars: string, exitCode: number) {
         fs.unlinkSync(envFile)
         fs.unlinkSync(bakeVars)
-        if (exitCode != 0) {
+        if (exitCode !== 0) {
             tl.setResult(tl.TaskResult.Failed, "Deployment Failed");
             process.exit(exitCode)
         }
@@ -128,7 +129,7 @@ export class clitask {
         let envName: string = tl.getInput('envName', false)
         let envCode: string = tl.getInput('envCode', false)
         let envRegions: string = tl.getInput('envRegions', false)
-        let skipAzureConnection: boolean = tl.getBoolInput('skipAzureConnection');
+        const skipAzureConnection: boolean = tl.getBoolInput('skipAzureConnection');
 
         if (!envName) {
             envName = process.env.BAKE_ENV_NAME || ""
@@ -160,7 +161,7 @@ export class clitask {
                 bakeVars += envvar + ": '" + process.env[envvar] + "'\n"
         }
 
-        let bakeVarFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.vars')
+        const bakeVarFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.vars')
         fs.writeFileSync(bakeVarFile, bakeVars)
         fs.chmodSync(bakeVarFile, 0o744)
 
@@ -179,8 +180,8 @@ export class clitask {
     }
 
     static setupKubernetesConfig(): void {
-        let useKubernetes: boolean = tl.getBoolInput("useKubernetes", false)
-        let configToken: string = tl.getInput("kubeConfigToken", false)
+        const useKubernetes: boolean = tl.getBoolInput("useKubernetes", false)
+        const configToken: string = tl.getInput("kubeConfigToken", false)
 
         if (!useKubernetes) {
             return
@@ -191,7 +192,7 @@ export class clitask {
 
         //in future we might pull in the k8s connection code and setup the config ourselves.
 
-        let kubeConfig = tl.getVariable("KUBECONFIG")
+        const kubeConfig = tl.getVariable("KUBECONFIG")
         if (!kubeConfig){
             tl.error("KUBECONFIG variable is not defined, can't bundle config file!")
             throw new Error("KUBECONFIG variable is not defined, can't bundle config file!")
@@ -207,8 +208,8 @@ export class clitask {
             throw new Error("Did not define a token for config data, can't bundle config file!")
         }
 
-        let data = fs.readFileSync(kubeConfig)
-        let base64 = data.toString('base64')
+        const data = fs.readFileSync(kubeConfig)
+        const base64 = data.toString('base64')
         process.env[configToken] = base64
     }
 
@@ -223,12 +224,12 @@ export class clitask {
 
         const connectedService: string = tl.getInput("azureConnection", true)
 
-        let servicePrincipalId: string = tl.getEndpointAuthorizationParameter(connectedService, "serviceprincipalid", false)
-        let authType: string = tl.getEndpointAuthorizationParameter(connectedService, 'authenticationType', true)
+        const servicePrincipalId: string = tl.getEndpointAuthorizationParameter(connectedService, "serviceprincipalid", false)
+        const authType: string = tl.getEndpointAuthorizationParameter(connectedService, 'authenticationType', true)
         let cliPasswordPath: string = ""
         let certHostPath: string = ""
         let servicePrincipalKey: string = ""
-        if (authType == "spnCertificate") {
+        if (authType === "spnCertificate") {
             tl.debug('certificate based endpoint')
             const certificateContent: string = tl.getEndpointAuthorizationParameter(connectedService, "servicePrincipalCertificate", false)
             certHostPath = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory'), 'spnCert.pem')
