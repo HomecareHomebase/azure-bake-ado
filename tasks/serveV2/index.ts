@@ -1,7 +1,6 @@
 import * as tl from "azure-pipelines-task-lib/task";
 import * as path from 'path'
 import * as fs from 'fs'
-import { Buffer } from 'buffer'
 import { IExecOptions } from 'azure-pipelines-task-lib/toolrunner';
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 //let docker = new dockerCLI.Docker()
