@@ -1,0 +1,125 @@
+{
+  "id": "75f3f5a8-ea14-41fd-9685-4d9396a807de",
+  "name": "azure-bake-serve",
+  "friendlyName": "Azure Bake Serve",
+  "description": "Azure Bake Serve Task",
+  "helpMarkDown": "",
+  "category": "Azure Pipelines",
+  "author": "HomecareHomebase",
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 0
+  },
+  "instanceNameFormat": "Azure Bake Serve",
+  "showEnvironmentVariables": false,
+  "groups": [
+    {
+      "name": "env",
+      "displayName": "Environment",
+      "isExpanded": true
+    },
+    {
+      "name": "general",
+      "displayName": "General",
+      "isExpanded": true
+    }
+  ],
+  "inputs": [
+    {
+      "name": "skipAzureConnection",
+      "type": "boolean",
+      "label": "Skip Azure Connection",
+      "required": false,
+      "helpMarkDown": "Skip logging into Azure for recipes that have no azure based deployments",
+      "groupName": "env"
+    },
+    {
+      "name": "azureConnection",
+      "type": "connectedService:AzureRM",
+      "label": "Azure Connection",
+      "required": false,
+      "helpMarkDown": "Select an Azure resource manager subscription for the deployment",
+      "groupName": "env",
+      "visibleRule": "skipAzureConnection == false"
+    },
+    {
+      "name": "envName",
+      "type": "string",
+      "label": "Environment Name",
+      "required": false,
+      "helpMarkDown": "If this is not assigned, will look for the pipeline variable: BAKE_ENV_NAME",
+      "groupName": "env",
+      "visibleRule": "skipAzureConnection == false"
+    },
+    {
+      "name": "envCode",
+      "type": "string",
+      "label": "Environment Code",
+      "required": false,
+      "helpMarkDown": "If this is not assigned, will look for the pipeline variable: BAKE_ENV_CODE",
+      "groupName": "env",
+      "visibleRule": "skipAzureConnection == false"
+    },
+    {
+      "name": "envRegions",
+      "type": "string",
+      "label": "Deployment Regions",
+      "required": false,
+      "helpMarkDown": "If this is not assigned, will look for the pipeline variable: BAKE_ENV_REGIONS",
+      "groupName": "env",
+      "visibleRule": "skipAzureConnection == false"
+    },
+    {
+      "name": "useKubernetes",
+      "type": "boolean",
+      "label": "Deploy to a Kubernetes Cluster",
+      "required": false,
+      "helpMarkDown": "Bundle the kubernetes config (must run k8 task login first) into the deployment",
+      "groupName": "env"
+    },
+    {
+      "name": "kubeConfigToken",
+      "type": "string",
+      "label": "Token Name",
+      "required": false,
+      "helpMarkDown": "name of the BAKE variable to store the kube config content",
+      "groupName": "env",
+      "defaultValue": "k8s_config",
+      "visibleRule": "useKubernetes == true"
+    },
+    {
+      "name": "rootCaFile",
+      "type": "string",
+      "label": "Root CA File",
+      "required": false,
+      "helpMarkDown": "Optional file path to a root CA PEM file to be used by node in bake",
+      "groupName": "env",
+      "defaultValue": ""
+    },
+    {
+      "name": "recipe",
+      "type": "string",
+      "label": "Bake Recipe Docker Tag",
+      "required": false,
+      "helpMarkDown": "Either define a recipe docker tag, or use the field below to define the Devops artifact bake.artifact file",
+      "groupName": "general"
+    },
+    {
+      "name": "recipeArtifact",
+      "type": "filePath",
+      "label": "Bake Recipe Artifact File",
+      "helpMarkDown": "Path to an attached Devops bake.artifact file from an attached Artifact drop. If not defined, Recipe field above is used",
+      "required": false,
+      "groupName": "general"
+    }
+  ],
+  "execution": {
+    "Node20_1": {
+      "target": "index.js"
+    },
+    "Node24_1": {
+      "target": "index.js"
+    }
+  }
+}
