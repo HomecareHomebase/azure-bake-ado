@@ -81,25 +81,38 @@ export class clitask {
 
             const tmpDir = tl.getVariable('agent.tempdirectory')
             const toolPath = path.join(tmpDir, 'bake')
+            const bakePackagePath = path.join(toolPath, 'node_modules', 'azure-bake', 'package.json')
+            const bakePackageName = 'azure-bake@' + runtimeVersion
 
             console.log('Installing Bake cli tool')
             if (!fs.existsSync(toolPath)) {
                 tl.mkdirP(toolPath)
             }
 
-            const installResult = tl.execSync('npm', 'install azure-bake',<IExecOptions>{
-                cwd : toolPath,
-                silent: true
-            })
+            let installBake = true
+            if (fs.existsSync(bakePackagePath)) {
+                const installedBakePackage = JSON.parse(fs.readFileSync(bakePackagePath, 'utf8'))
+                installBake = installedBakePackage.version !== runtimeVersion
+            }
 
-            if (installResult.code !== 0) {
-                const installError = installResult.stderr || installResult.stdout || ('exit code ' + installResult.code);
-                throw new Error('Failed to install azure-bake: ' + installError);
+            if (installBake) {
+                const installResult = tl.execSync('npm', 'install ' + bakePackageName,<IExecOptions>{
+                    cwd : toolPath,
+                    silent: true
+                })
+
+                if (installResult.code !== 0) {
+                    const installError = installResult.stderr || installResult.stdout || ('exit code ' + installResult.code);
+                    throw new Error('Failed to install ' + bakePackageName + ': ' + installError);
+                }
             }
 
             //executing bake mix
-            const bakeTool = tl.tool('npx')
-            const code = await bakeTool.arg('bake').arg('mix')
+            const bakeExecutable = process.platform === 'win32'
+                ? path.join(toolPath, 'node_modules', '.bin', 'bake.cmd')
+                : path.join(toolPath, 'node_modules', '.bin', 'bake')
+            const bakeTool = tl.tool(bakeExecutable)
+            const code = await bakeTool.arg('mix')
                 .arg('--runtime='+runtimeVersion)
                 .arg('--name='+imageName)
                 .arg(bakeFile)
