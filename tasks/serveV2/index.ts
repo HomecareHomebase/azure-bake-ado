@@ -29,14 +29,14 @@ export class clitask {
             this.setupKubernetesConfig()
             this.setupEnvironment()
 
-            this.deployImage(recipeName, recipeArtifact, rootCaFile)
+            await this.deployImage(recipeName, recipeArtifact, rootCaFile)
         } catch (err) {
             const message = err instanceof Error ? err.message : String(err);
             tl.setResult(tl.TaskResult.Failed, message);
         }
 
     }
-    static deployImage(recipe: string, recipeFile: string, rootCaFile: string | undefined | null = null): void {
+    static async deployImage(recipe: string, recipeFile: string, rootCaFile: string | undefined | null = null): Promise<void> {
 
         if (recipeFile) {
             const contents = fs.readFileSync(recipeFile)
@@ -46,17 +46,7 @@ export class clitask {
 
         recipe = recipe.toLowerCase()
 
-        /*RegEx to determine if it is local or remote Docker Registry
-        let remoteRegistry = recipe.match(/(.*)[\/.*]/)
-        let login = tl.tool('docker')
-
-        if (remoteRegistry && !recipeFile) {
-            console.log("Logging into registry at: " + remoteRegistry[1])
-            let l = login.arg('login -u ' + process.env.BAKE_AUTH_SERVICE_ID + ' -p ' + process.env.BAKE_AUTH_SERVICE_KEY + ' ' + remoteRegistry[1]).exec()        
-        }*/
-        
-       // let dockerindocker: boolean = tl.getBoolInput('dockerindocker') 
-        const _execOptions = <IExecOptions> { failOnStdErr: true,
+        const execOptions = <IExecOptions> { failOnStdErr: true,
                             ignoreReturnCode: false } 
         
         const envFile = path.join(tl.getVariable('Agent.TempDirectory') || tl.getVariable('system.DefaultWorkingDirectory') || 'c:/temp/', 'bake.env')
@@ -84,16 +74,17 @@ export class clitask {
         process.env.BAKE_ENV_NAME = process.env.BAKE_ENV_CODE = process.env.BAKE_ENV_REGIONS = process.env.BAKE_AUTH_SUBSCRIPTION_ID =
             process.env.BAKE_AUTH_TENANT_ID = process.env.BAKE_AUTH_SERVICE_ID = process.env.BAKE_AUTH_SERVICE_KEY = process.env.BAKE_AUTH_SERVICE_CERT =
             ""
-        
-        //we need to force pull the docker image, in case the tag was local already (but old content)
-        let p = tl.tool('docker').arg('pull').arg(recipe).exec()        
-        p.then(()=>{
-            const tool = tl.tool('docker')
 
+        let exitCode = 0
+        try {
+            //we need to force pull the docker image, in case the tag was local already (but old content)
+            await tl.tool('docker').arg('pull').arg(recipe).exec()
+
+            const tool = tl.tool('docker')
             let args = tool.arg('run').arg('--rm').arg('-t')
                 .arg('--env-file=' + envFile)
                 .arg(`-v=${process.env.BAKE_VARIABLES}:/app/bake/.env:Z`)
-            
+
             if (rootCaFile){
                 args = args.arg(`-v=${rootCaFile}:/app/ca.crt:Z`)
             }
@@ -103,25 +94,24 @@ export class clitask {
                 args = args.arg(`-v=${certHostPath}:/app/spnCert.pem:Z`)
             }
 
-            p = args.arg(recipe)
-                .exec(_execOptions) 
-            p.then((code) => {
-                this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, code)
-            }, (err) => {
-                this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, 2)
-            })            
-        }, (err)=>{
-            console.error('Error pulling image : ' + err)
-            this.cleanupAndExit(envFile, process.env.BAKE_VARIABLES, 2)
-        })
-    }
+            exitCode = await args.arg(recipe).exec(execOptions)
+        } catch (err) {
+            console.error('Error during deployment: ' + err)
+            exitCode = 2
+        } finally {
+            //clean up temp files
+            try { fs.unlinkSync(envFile) } catch (_) { /* best-effort */ }
+            try { fs.unlinkSync(process.env.BAKE_VARIABLES) } catch (_) { /* best-effort */ }
 
-    static cleanupAndExit(envFile: string, bakeVars: string, exitCode: number) {
-        fs.unlinkSync(envFile)
-        fs.unlinkSync(bakeVars)
+            //clean up SPN certificate file if it was written
+            const certPath = process.env.BAKE_AUTH_SERVICE_CERT_HOST_PATH
+            if (certPath) {
+                try { fs.unlinkSync(certPath) } catch (_) { /* best-effort */ }
+            }
+        }
+
         if (exitCode !== 0) {
-            tl.setResult(tl.TaskResult.Failed, "Deployment Failed");
-            process.exit(exitCode)
+            throw new Error('Deployment Failed')
         }
     }
 
@@ -155,7 +145,7 @@ export class clitask {
         //gather up all environment variables.
         const secretPrefixes = ["BAKE_", "ENDPOINT_", "INPUT_", "SECRET_", "SYSTEM_ACCESSTOKEN", "VSMARKETPLACETOKEN"]
         let bakeVars: string = ""
-        for (let envvar in process.env) {
+        for (const envvar in process.env) {
             const upperVar = envvar.toUpperCase()
             if (!secretPrefixes.some(prefix => upperVar.startsWith(prefix)))
                 bakeVars += envvar + ": '" + process.env[envvar] + "'\n"

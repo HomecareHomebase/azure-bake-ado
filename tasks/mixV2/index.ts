@@ -174,7 +174,7 @@ export class clitask {
         // For each of the image names, generate a mapping from the source image name to the target image.  The same source image name
         // may be listed more than once if there are multiple tags.  The target image names will be tagged based on the task configuration.
         for (let i = 0; i < imageInfos.length; i++) {
-            let imageInfo = imageInfos[i];
+            const imageInfo = imageInfos[i];
             imageInfo.taggedImages.push(imageInfo.qualifiedImageName);
             sourceTags.forEach(tag => {
                 imageInfo.taggedImages.push(imageInfo.baseImageName + ":" + tag);
