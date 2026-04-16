@@ -26,6 +26,8 @@ steps:
   displayName: 'Authenticate npm feed'
   inputs:
     workingFile: '.npmrc'
+- script: cp .npmrc ~/.npmrc
+  displayName: 'Propagate npm auth to user level'
 - task: PowerShell@2
   displayName: 'NPM Build'
   inputs:
