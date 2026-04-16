@@ -6,6 +6,7 @@
       "sourceMap": true,
       "strict": false,
       "strictNullChecks": false,
-      "removeComments": true
+      "removeComments": true,
+      "skipLibCheck": true
     }
 }

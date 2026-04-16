@@ -1,4 +1,5 @@
 *.vsix
+*.tsbuildinfo
 /tasks/**/*.js
 /tasks/**/*.js.map
 tools/**
