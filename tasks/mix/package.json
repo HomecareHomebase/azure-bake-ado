@@ -17,7 +17,7 @@
   "author": "HomecareHomebase",
   "license": "ISC",
   "dependencies": {
-    "azure-pipelines-task-lib": "^2.8.0",
+    "azure-pipelines-task-lib": "^4.0.0",
     "docker-common": "file:../../imports/docker-common-1.0.0.tgz",
     "@types/node": "^11.13.1",
     "@types/q": "^1.5.2"
